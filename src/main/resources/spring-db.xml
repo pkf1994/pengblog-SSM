@@ -17,10 +17,10 @@
         http://www.springframework.org/schema/mvc/spring-mvc.xsd">
         
 		<!-- 注册数据库连接池 -->
-		<bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource">
-			<property name="driverClassName" value="${jdbc.driver}" />
-			<property name="url" value="${jdbc.url}" />
-			<property name="username" value="${jdbc.user}" />
+		<bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
+			<property name="driverClass" value="${jdbc.driver}" />
+			<property name="jdbcUrl" value="${jdbc.url}" />
+			<property name="user" value="${jdbc.user}" />
 			<property name="password" value="${jdbc.password}" />
 		</bean>
 		
