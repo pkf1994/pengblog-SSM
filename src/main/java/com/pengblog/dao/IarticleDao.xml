@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pengblog.dao.IarticleDao">
+	<!-- 根据参数列表获取 -->
+	<select id="selectArticleListByLimitIndex" resultType="Article">
+		SELECT 
+		<foreach collection="paramList" open="" close="" separator="," item="field">
+				${field}
+		</foreach>
+		FROM
+			article
+		WHERE
+			article_type =  #{article_type}
+		AND
+			isdeleted = 0
+		ORDER BY 
+			article_releaseTime
+		DESC	
+		LIMIT
+			#{startIndex}, #{pageScale}
+	</select> 
+	
+	<select id="selectCountOfArticle" resultType="int">
+		SELECT COUNT(*) FROM
+			article
+		WHERE 
+			article_type = #{article_type}
+		AND
+			isdeleted = 0
+	</select>
+	
+	<select id="selectArticleById" resultType="Article">
+		SELECT * FROM
+		  	article
+		WHERE
+			article_id = #{article_id}
+		AND
+			isdeleted = false
+	</select>
+	
+	<insert id="insertArticle">
+		INSERT INTO
+			article(article_title, 
+					article_author, 
+					article_label, 
+					article_summary, 
+					article_content,
+					article_releaseTime,
+					article_type, 
+					article_previewImageUrl)
+		VALUES(#{article_title}, 
+				#{article_author}, 
+				#{article_label}, 
+				#{article_summary},
+				#{article_content},
+				#{article_releaseTime},
+				#{article_type}, 
+				#{article_previewImageUrl})
+		<selectKey resultType="int" keyProperty="article_id" order="AFTER">
+			select @@identity
+		</selectKey>
+	</insert>
+	
+	<update id="deleteArticleById">
+		UPDATE 
+			article
+		SET
+			isdeleted = 1
+		WHERE
+			article_id = #{article_id}
+	</update>
+	
+	<update id="updateArticle">
+		UPDATE 
+			article
+		SET
+			article_title = #{article_title},
+			article_author = #{article_author},
+			article_label = #{article_label},
+			article_summary = #{article_summary},
+			article_content = #{article_content},
+			article_releaseTime = #{article_releaseTime},
+			article_type = #{article_type},
+			article_previewImageUrl = #{article_previewImageUrl}
+		WHERE
+			article_id = #{article_id}
+	</update>
+	
+	<select id="selectCountOfArticleByDateBetween" resultType="int">
+		SELECT COUNT(*) FROM
+			article
+		WHERE
+			article_type =  #{article_type}
+		AND
+			article_releaseTime > #{tempDateBegin}
+		AND
+			#{tempDateEnd} >= article_releaseTime
+		AND
+			isdeleted = 0
+	</select>
+
+	<select id="selectArticleLabelList" resultType="java.util.HashMap">  
+        SELECT 
+        	article_label,
+        	count(article_id) as number
+       	FROM 
+       		article
+   		WHERE
+   			 article_type = 'article'
+ 		AND
+ 			isdeleted = 0
+	 	GROUP BY
+	 		article_label
+	</select>
+	
+	<select id="selectArticleByLimitIndexAndSearchWords" resultType="Article">
+		SELECT
+		<foreach collection="paramList" open="" close="" separator="," item="field">
+				${field}
+		</foreach>
+		FROM
+			article
+		WHERE
+			article_type =  #{article_type}
+		AND
+			isdeleted = 0
+		AND
+		<foreach collection="searchWords" open="" close="" separator="or" item="word">
+				article_title LIKE  CONCAT('%',#{word},'%') 
+				or 
+				article_author  LIKE CONCAT('%',#{word},'%') 
+				or 
+				article_label LIKE CONCAT('%',#{word},'%')
+		</foreach>
+		ORDER BY 
+			article_releaseTime
+		DESC	
+		LIMIT
+			#{startIndex}, #{pageScale}
+	</select>
+	
+	<select id="selectCountOfArticleBySearchWords" resultType="int">
+		SELECT COUNT(*) FROM
+			article
+		WHERE 
+			article_type =  #{article_type}
+		AND
+			isdeleted = 0
+		AND
+		<foreach collection="searchWords" open="" close="" separator="or" item="word">
+				article_title LIKE  CONCAT('%',#{word},'%') 
+				or 
+				article_author  LIKE CONCAT('%',#{word},'%') 
+				or 
+				article_label LIKE CONCAT('%',#{word},'%')
+		</foreach>
+	</select>
+	
+	<select id="selectArticleByLimitIndexAndDateBetween" resultType="Article">
+		SELECT
+		<foreach collection="paramList" open="" close="" separator="," item="field">
+				${field}
+		</foreach>
+		FROM
+			article
+		WHERE
+			article_type =  #{article_type}
+		AND
+			article_releaseTime > #{beginDate}
+		AND
+			#{endDate} >= article_releaseTime
+		AND
+			isdeleted = 0
+		ORDER BY 
+			article_releaseTime
+		DESC	
+		LIMIT
+			#{startIndex}, #{pageScale}
+	</select>
+	
+	<select id="selectArticleByLimitIndexAndLabel" resultType="Article">
+		SELECT
+		<foreach collection="paramList" open="" close="" separator="," item="field">
+				${field}
+		</foreach>
+		FROM
+			article
+		WHERE
+			article_type = #{article_type}
+		AND
+			article_label = #{article_label}
+		AND
+			isdeleted = 0
+		ORDER BY 
+			article_releaseTime
+		DESC	
+		LIMIT
+			#{startIndex}, #{pageScale}
+	</select>
+	
+	<select id="selectCountOfArticleByLabel" resultType="int">
+		SELECT COUNT(*) FROM
+			article
+		WHERE 
+			article_type = #{article_type}
+		AND
+			article_label = #{article_label}
+		AND
+			isdeleted = 0
+	</select>
+</mapper>

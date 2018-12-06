@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pengblog.dao.IadministratorDao">
+
+	<select id="selectAdministratorByUsername" resultType="com.pengblog.bean.Administrator">
+		SELECT 
+			*
+		FROM
+			administrator
+		WHERE
+			administrator_username = #{administrator_username}
+	</select>
+	
+	<select id="selectAdministratorById" resultType="com.pengblog.bean.Administrator">
+		SELECT 
+			*
+		FROM
+			administrator
+		WHERE
+			administrator_id = #{administrator_id}
+	</select>
+	
+</mapper>

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pengblog.dao.IvisitorDao">
+	
+	<insert id="insertVisitor">
+		INSERT INTO 
+			visitor(visitor_name, visitor_email, visitor_siteAddress)
+		VALUES(#{visitor_name}, #{visitor_email}, #{visitor_siteAddress})
+		<selectKey resultType="int" keyProperty="visitor_id" order="AFTER">
+			select @@identity
+		</selectKey>
+	</insert>
+	
+	<select id="selectVisitorByName" resultType="com.pengblog.bean.Visitor">
+		SELECT 
+			*
+		FROM
+			visitor
+		WHERE
+			visitor_name = #{visitor_name}
+	</select>
+	
+	<update id="updateVisitor">
+		UPDATE 
+			visitor
+		SET
+			visitor_name = #{visitor_name},
+			visitor_email = #{visitor_email},
+			visitor_siteAddress = #{visitor_siteAddress}
+		WHERE
+			visitor_id = #{visitor_id}
+	</update>
+	
+</mapper>

@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pengblog.dao.IcommentDao">
+
+	<resultMap type="Comment" id="commentMapper">
+		<id column="comment_id" property="comment_id"/>
+		<result column="comment_referComment" property="comment_referComment"/>
+		<result column="comment_content" property="comment_content"/>
+		<result column="comment_releaseTime" property="comment_releaseTime"/>
+		<association property="comment_author"
+					javaType="Visitor"
+					select="selectVisitorById"
+					column="comment_author"/>
+		<association property="comment_hostArticle"
+					javaType="com.pengblog.bean.Article"
+					select="selectArticleById"
+					column="comment_hostId"/>
+	</resultMap>
+	
+	<select id="selectVisitorById" resultType="Visitor">
+		SELECT * FROM
+			visitor
+		WHERE 
+			visitor_id = #{comment_author}
+		AND
+			isdeleted = 0
+	</select>
+	
+	<select id="selectArticleById" resultType="com.pengblog.bean.Article">
+		SELECT 
+			article_id,
+			article_label,
+			article_title
+	 	FROM
+			article
+		WHERE 
+			article_id = #{comment_hostId}
+	</select>
+	
+	<select id="selectCountOfCommentByHostId" resultType="int">
+		SELECT COUNT(*) FROM
+			comment
+		WHERE 
+		   comment_hostid = #{hostId}
+	  	AND
+			isdeleted = 0
+	</select>
+	
+	<select id="selectCommentListByLimitIndex" resultMap="commentMapper">
+		SELECT * FROM
+			comment
+		WHERE
+			comment_hostid = #{hostId}
+		AND
+			isdeleted = 0
+		ORDER BY 
+			comment_releaseTime
+		DESC	
+		LIMIT
+			#{startIndex}, #{pageScale}
+	</select>
+	
+	<select id="selectCommentById" resultMap="commentMapper">
+		SELECT * FROM
+			comment
+		WHERE
+			comment_id = #{comment_id}
+	</select>
+	
+	<insert id="insertComment">
+		INSERT INTO
+			comment(comment_author, 
+					comment_referComment, 
+					comment_content, 
+					comment_releaseTime, 
+					comment_hostId)
+		VALUES(#{comment_author.visitor_id}, 
+				#{comment_referComment}, 
+				#{comment_content}, 
+				#{comment_releaseTime},
+				#{comment_hostArticle.article_id})
+		<selectKey resultType="int" keyProperty="comment_id" order="AFTER">
+			select @@identity
+		</selectKey>
+	</insert>
+	
+	<update id="deleteCommentByArticleId">
+		UPDATE
+			comment
+		SET
+			isdeleted = 1
+		WHERE
+			comment_hostId = #{comment_hostId}
+	</update>
+	
+	<update id="deleteCommentById">
+		UPDATE
+			comment
+		SET
+			isdeleted = 1
+		WHERE
+			comment_id = #{comment_id}
+	</update>
+	
+	<select id="selectCommentLastListByLimitIndex" resultMap="commentMapper">
+		SELECT * FROM
+			comment
+		WHERE
+			isdeleted = 0
+		ORDER BY 
+			comment_releaseTime
+		DESC	
+		LIMIT
+			#{startIndex}, #{pageScale}
+	</select>
+	
+	<select id="selectCountOfComment" resultType="int">
+		SELECT COUNT(*) FROM
+			comment
+		WHERE
+			isdeleted = 0
+	</select>
+</mapper>

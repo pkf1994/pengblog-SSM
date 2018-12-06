@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="error">
+
+ 	<Properties> <!-- 配置日志文件输出目录，此配置将日志输出到tomcat根目录下的指定文件夹 -->
+        <!-- <Property name="LOG_HOME">
+        	${sys:catalina.home}/WebAppLogs/HHServices
+        </Property> -->
+        <Property name="PROJECT">
+        	pengkaifanblog
+        </Property>
+        <Property name="LOG_HOME">
+        	${sys:catalina.home}/webapps/${PROJECT}
+        </Property>
+    </Properties>
+    
+    <Appenders>
+       <Console name="Console" target="SYSTEM_OUT">
+          <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
+       </Console>
+       
+        <RollingFile name="RollingFile" 
+        				fileName="${LOG_HOME}/log/info/log.log" 
+        				filePattern="${LOG_HOME}/log/info//log - %d{yyyy-MM-dd HH_mm_ss}.log.gz">
+                <PatternLayout pattern="%d{yyyy-MM-dd 'at' HH:mm:ss z} %-5level %class{36} %L %M - %msg%xEx%n"/>
+                <SizeBasedTriggeringPolicy size="20MB"/>
+                <!-- DefaultRolloverStrategy属性如不设置，则默认为最多同一文件夹下7个文件，这里设置了20 -->
+                <DefaultRolloverStrategy max="20"/>
+       	</RollingFile>
+       	
+       	<RollingFile name="RollingFileError" fileName="${LOG_HOME}/log/error/app.log"
+                     filePattern="${LOG_HOME}/log/error/$${date:yyyy-MM}/app-%d{MM-dd-yyyy}-%i.log.gz">
+                <ThresholdFilter level="error" onMatch="ACCEPT" onMismatch="DENY"/>
+                <PatternLayout pattern="%d{yyyy-MM-dd 'at' HH:mm:ss z} %-5level %class{36} %L %M - %msg%xEx%n"/>
+                <SizeBasedTriggeringPolicy size="20MB"/>
+                <!-- DefaultRolloverStrategy属性如不设置，则默认为最多同一文件夹下7个文件，这里设置了20 -->
+                <DefaultRolloverStrategy max="20"/>
+       	</RollingFile>
+    </Appenders>
+    <Loggers>
+	   	<logger name="org.springframework" level="INFO"></logger>
+ 		<logger name="org.mybatis" level="INFO"></logger>
+       <Root level="all">
+ 			<AppenderRef ref="RollingFile" level="info"/>
+          	<AppenderRef ref="Console" />
+          	<AppenderRef ref="RollingFileError"/>
+       </Root>
+    </Loggers>
+</Configuration>
