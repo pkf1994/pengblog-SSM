@@ -61,6 +61,51 @@ public class CommentController {
 		return retJson;
 	}
 	
+
+	@RequestMapping(value="/top_level_comment_list.do", produces="application/json;charset=UTF-8")
+	@ResponseBody
+	public Object getTopLevelCommentList(int article_id, int startIndex, int pageScale) {
+		
+		int maxPage = commentService.getMaxPageOfTopLevelComment(article_id, pageScale);
+		
+		int countOfComment = commentService.getCountOfComment(article_id);
+		
+		Comment[] commentList = commentService.getTopLevelCommentList(article_id, startIndex, pageScale);
+		
+		Gson gson = new Gson();
+		Map<String,Object> ret = new HashMap<>();
+		ret.put("maxPage", maxPage);
+		ret.put("commentList", commentList);
+		ret.put("countOfComment", countOfComment);
+		String retJson = gson.toJson(ret);
+		
+		System.out.println(retJson);
+		
+		return retJson;
+	}
+	
+	@RequestMapping(value="/sub_comment_list.do", produces="application/json;charset=UTF-8")
+	@ResponseBody
+	public Object getSubCommentList(int comment_id, int startIndex, int pageScale) {
+		
+		int maxPage = commentService.getMaxPageOfSubComment(comment_id, pageScale);
+		
+		int countOfSubComment = commentService.getCountOfSubComment(comment_id);
+		
+		Comment[] subCommentList = commentService.getSubCommentList(comment_id, startIndex, pageScale);
+		
+		Gson gson = new Gson();
+		Map<String,Object> ret = new HashMap<>();
+		ret.put("maxPage", maxPage);
+		ret.put("subCommentList", subCommentList);
+		ret.put("countOfSubComment", countOfSubComment);
+		String retJson = gson.toJson(ret);
+		
+		System.out.println(retJson);
+		
+		return retJson;
+	}
+	
 	@RequestMapping(value="/comment.do", produces="application/json;charset=UTF-8")
 	@ResponseBody
 	public Object getComment(int comment_id) {
@@ -104,7 +149,7 @@ public class CommentController {
 		
 		List<Comment> comments = commentService.getCommentLastListByLimitIndex(currentPage, pageScale);
 		
-		int maxPage = commentService.getMaxPageOfCommentLast(pageScale);
+		int maxPage = commentService.getMaxPageOfComment(pageScale);
 		
 		Map<String, Object> retMap = new HashMap<>();
 	

@@ -6,7 +6,7 @@
         	${sys:catalina.home}/WebAppLogs/HHServices
         </Property> -->
         <Property name="PROJECT">
-        	pengkaifanblog
+        	pengblog-SSM
         </Property>
         <Property name="LOG_HOME">
         	${sys:catalina.home}/webapps/${PROJECT}

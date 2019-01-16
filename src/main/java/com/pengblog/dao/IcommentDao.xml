@@ -6,9 +6,13 @@
 
 	<resultMap type="Comment" id="commentMapper">
 		<id column="comment_id" property="comment_id"/>
-		<result column="comment_referComment" property="comment_referComment"/>
 		<result column="comment_content" property="comment_content"/>
 		<result column="comment_releaseTime" property="comment_releaseTime"/>
+		<result column="comment_haveSubComment" property="comment_haveSubComment"/>
+		<association property="comment_referComment"
+					javaType="Visitor"
+					select="selectCommentById"
+					column="comment_refercomment"/>
 		<association property="comment_author"
 					javaType="Visitor"
 					select="selectVisitorById"
@@ -18,6 +22,8 @@
 					select="selectArticleById"
 					column="comment_hostId"/>
 	</resultMap>
+	
+	
 	
 	<select id="selectVisitorById" resultType="Visitor">
 		SELECT * FROM
@@ -48,6 +54,26 @@
 			isdeleted = 0
 	</select>
 	
+	<select id="selectCountOfSecondaryComment" resultType="int">
+		SELECT COUNT(*) FROM
+			comment
+		WHERE 
+		   comment_referComment = #{comment_id}
+	  	AND
+			isdeleted = 0
+	</select>
+	
+	<select id="selectCountOfTopLevelCommentByHostId" resultType="int">
+		SELECT COUNT(*) FROM
+			comment
+		WHERE 
+		   comment_hostid = #{hostId}
+	  	AND
+	  		comment_referComment IS NULL
+  		AND
+			isdeleted = 0
+	</select>
+	
 	<select id="selectCommentListByLimitIndex" resultMap="commentMapper">
 		SELECT * FROM
 			comment
@@ -58,6 +84,36 @@
 		ORDER BY 
 			comment_releaseTime
 		DESC	
+		LIMIT
+			#{startIndex}, #{pageScale}
+	</select>
+	
+	<select id="selectTopLevelCommentListByLimitIndex" resultMap="commentMapper">
+		SELECT * FROM
+			comment
+		WHERE
+			comment_hostid = #{hostId}
+		AND
+			comment_referComment IS NULL
+		AND
+			isdeleted = 0
+		ORDER BY 
+			comment_releaseTime
+		ASC	
+		LIMIT
+			#{startIndex}, #{pageScale}
+	</select>
+	
+	<select id="selectSubCommentListByLimitIndex" resultMap="commentMapper">
+		SELECT * FROM
+			comment
+		WHERE
+			comment_referComment = #{comment_id}
+		AND
+			isdeleted = 0
+		ORDER BY 
+			comment_releaseTime
+		ASC	
 		LIMIT
 			#{startIndex}, #{pageScale}
 	</select>

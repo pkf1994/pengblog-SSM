@@ -22,6 +22,14 @@
 			<property name="jdbcUrl" value="${jdbc.url}" />
 			<property name="user" value="${jdbc.user}" />
 			<property name="password" value="${jdbc.password}" />
+			
+	 	  	<property name="checkoutTimeout" value="30000"/>
+	        <property name="idleConnectionTestPeriod" value="30"/>
+	        <property name="initialPoolSize" value="3"/>
+	        <property name="maxIdleTime" value="30"/>
+	        <property name="maxPoolSize" value="100"/>
+	        <property name="minPoolSize" value="2"/>
+	        <property name="maxStatements" value="200"/>
 		</bean>
 		
 		<!-- 注册数据库四要素配置文件地址 -->

@@ -9,13 +9,15 @@ public class Comment implements Serializable{
 	
 	private Visitor comment_author;
 	
-	private Integer comment_referComment;
+	private Comment comment_referComment;
 	
 	private String comment_content;
 	
 	private Date comment_releaseTime;
 	
 	private Article comment_hostArticle;
+	
+	private Boolean comment_haveSubComment;
 
 	/**
 	 * @return the comment_id
@@ -58,11 +60,11 @@ public class Comment implements Serializable{
 	
 
 
-	public Integer getComment_referComment() {
+	public Comment getComment_referComment() {
 		return comment_referComment;
 	}
 
-	public void setComment_referComment(Integer comment_referComment) {
+	public void setComment_referComment(Comment comment_referComment) {
 		this.comment_referComment = comment_referComment;
 	}
 
@@ -81,9 +83,18 @@ public class Comment implements Serializable{
 	public void setComment_hostArticle(Article comment_hostArticle) {
 		this.comment_hostArticle = comment_hostArticle;
 	}
+	
 
-	public Comment(Integer comment_id, Visitor comment_author, Integer comment_referComment, String comment_content,
-			Date comment_releaseTime, Article comment_hostArticle) {
+	public Boolean getComment_haveSubComment() {
+		return comment_haveSubComment;
+	}
+
+	public void setComment_haveSubComment(Boolean comment_haveSubComment) {
+		this.comment_haveSubComment = comment_haveSubComment;
+	}
+
+	public Comment(Integer comment_id, Visitor comment_author, Comment comment_referComment, String comment_content,
+			Date comment_releaseTime, Article comment_hostArticle, Boolean comment_haveSubComment) {
 		super();
 		this.comment_id = comment_id;
 		this.comment_author = comment_author;
@@ -91,7 +102,9 @@ public class Comment implements Serializable{
 		this.comment_content = comment_content;
 		this.comment_releaseTime = comment_releaseTime;
 		this.comment_hostArticle = comment_hostArticle;
+		this.comment_haveSubComment = comment_haveSubComment;
 	}
+
 
 	/**
 	 * 

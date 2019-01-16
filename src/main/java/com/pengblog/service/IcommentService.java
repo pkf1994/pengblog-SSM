@@ -18,16 +18,15 @@ public interface IcommentService {
 	 * @param pageScale
 	 * @return
 	 */
-	int getMaxPage(int hostid, int pageScale);
+	int getMaxPage(int hostId, int pageScale);
 
-	/**
-	 * @param currentPage
-	 * @param pageScale
-	 * @return
-	 */
-	Comment[] getCommentList(int hostid, int startIndex, int pageScale);
+	Comment[] getCommentList(int hostId, int startIndex, int pageScale);
+	
+	Comment[] getTopLevelCommentList(int hostId, int startIndex, int pageScale);
 
 	int getCountOfComment(int article_id);
+	
+	int getCountOfSecondaryComment(int comment_id);
 
 	Comment getCommentById(int comment_id);
 
@@ -37,10 +36,20 @@ public interface IcommentService {
 
 	List<Comment> getCommentLastListByLimitIndex(int startIndex, int pageScale);
 
-	int getMaxPageOfCommentLast(int pageScale);
+	int getMaxPageOfComment(int pageScale);
+	
+	int getMaxPageOfTopLevelComment(int hostId, int pageScale);
+	
+	int getMaxPageOfSecondaryComment(int comment_id, int pageScale);
 
 	int getCountOfCommentByArticleId(int article_id);
-
+	
 	void deleteCommentById(int comment_id);
+
+	int getMaxPageOfSubComment(int comment_id, int pageScale);
+
+	int getCountOfSubComment(int comment_id);
+
+	Comment[] getSubCommentList(int comment_id, int startIndex, int pageScale);
 
 }

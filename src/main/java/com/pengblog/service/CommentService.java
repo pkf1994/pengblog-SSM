@@ -94,7 +94,9 @@ public class CommentService implements IcommentService{
 		}
 		
 		if(commentData.containsKey("comment_referComment") && (commentData.get("comment_referComment")!="")) {
-			comment.setComment_referComment(Integer.parseInt(commentData.get("comment_referComment")));
+			Comment referComment = getCommentById(Integer.parseInt(commentData.get("comment_referComment")));
+			if(referComment != null)
+			comment.setComment_referComment(referComment);
 		}
 		
 		if(commentData.containsKey("comment_content") && (commentData.get("comment_content")!="")) {
@@ -135,7 +137,7 @@ public class CommentService implements IcommentService{
 	}
 
 	@Override
-	public int getMaxPageOfCommentLast(int pageScale) {
+	public int getMaxPageOfComment(int pageScale) {
 
 		int countOfComment = commentDao.selectCountOfComment();
 		
@@ -163,6 +165,63 @@ public class CommentService implements IcommentService{
 		
 	}
 
+	@Override
+	public Comment[] getTopLevelCommentList(int hostId, int startIndex, int pageScale) {
+		Comment[] commentList = commentDao.selectTopLevelCommentListByLimitIndex(hostId, startIndex, pageScale);
+		return commentList;
+	}
+
+	@Override
+	public int getCountOfSecondaryComment(int comment_id) {
+		int count = commentDao.selectCountOfSecondaryComment(comment_id);
+		
+		return count;
+	}
+
+	@Override
+	public int getMaxPageOfTopLevelComment(int hostId, int pageScale) {
+		
+		int countOfTopLevelComment = commentDao.selectCountOfTopLevelCommentByHostId(hostId);
+		
+		int maxPage = (int) Math.ceil((double)(countOfTopLevelComment/pageScale)) + 1;
+				
+		return maxPage;
+	}
+
+	@Override
+	public int getMaxPageOfSecondaryComment(int comment_id, int pageScale) {
+		int countOfTopSecondaryComment = commentDao.selectCountOfSecondaryComment(comment_id);
+		
+		int maxPage = (int) Math.ceil((double)(countOfTopSecondaryComment/pageScale)) + 1;
+		
+		return maxPage;
+	}
+
+	@Override
+	public int getMaxPageOfSubComment(int comment_id, int pageScale) {
+		
+		int countOfSubComment = commentDao.selectCountOfSecondaryComment(comment_id);
+		
+		int maxPage = (int) Math.ceil((double)(countOfSubComment/pageScale)) + 1;
+				
+		return maxPage;
+	}
+
+	@Override
+	public int getCountOfSubComment(int comment_id) {
+		
+		int countOfSubComment = commentDao.selectCountOfSecondaryComment(comment_id);
+		
+		return countOfSubComment;
+	}
+
+	@Override
+	public Comment[] getSubCommentList(int comment_id, int startIndex, int pageScale) {
+		
+		Comment[] subCommentList = commentDao.selectSubCommentListByLimitIndex(comment_id, startIndex, pageScale);
+		
+		return subCommentList;
+	}
 
 
 }
