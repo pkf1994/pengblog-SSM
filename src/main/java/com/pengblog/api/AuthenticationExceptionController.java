@@ -28,4 +28,19 @@ public class AuthenticationExceptionController {
 	}
 	
 
+	@ExceptionHandler()
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseBody
+	public ErrorInfo handleCommonException(Exception e) {
+		
+		ErrorInfo r = new ErrorInfo();
+        r.setSuccess(false);
+        r.setMsg(e.getMessage());
+        
+        return r;
+		
+	}
+	
+	
+
 }
