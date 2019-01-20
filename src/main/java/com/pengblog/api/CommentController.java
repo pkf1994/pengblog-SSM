@@ -131,15 +131,19 @@ public class CommentController {
 		
 		comment.setComment_author(visitor);
 		
-		int insertCommentSuccessful = commentService.saveComment(comment);
+		commentService.saveComment(comment);
 		
-		if(insertCommentSuccessful == 1) {
-			
-			return "submit comment successful";
-			
-		}
+		Map<String, Object> retMap = new HashMap<>();
 		
-		return "submit comment fail";
+		retMap.put("commentIdJustSubmit", comment.getComment_id());
+		
+		retMap.put("submitSuccessful", true);
+		
+		Gson gson = new Gson();
+		
+		String retJson = gson.toJson(retMap);
+	
+		return retJson;
 		
 	}
 	
