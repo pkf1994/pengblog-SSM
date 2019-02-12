@@ -74,5 +74,7 @@ public interface IarticleService {
 
 	int getCountOfArticle(String article_type);
 
+	Article getDraft();
+
 
 }

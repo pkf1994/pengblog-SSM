@@ -72,6 +72,13 @@ public class CommentService implements IcommentService{
 		
 		int comment_id = commentDao.insertComment(comment);
 		
+		Comment referComment = comment.getComment_referComment();
+				
+		if(referComment != null) {
+			referComment.setComment_haveSubComment(true);
+			commentDao.updateComment(referComment);
+		}
+		
 		logger.info(LogUtil.infoBegin);
 		logger.info("保存评论: " + comment.getComment_author().getVisitor_name() + "-" + comment.getComment_content());
 		logger.info(LogUtil.infoEnd);
@@ -93,7 +100,7 @@ public class CommentService implements IcommentService{
 			visitor.setVisitor_name(commentData.get("visitor_name"));
 		}
 		
-		if(commentData.containsKey("comment_referComment") && (commentData.get("comment_referComment")!="")) {
+		if(commentData.containsKey("comment_referComment") && (commentData.get("comment_referComment")!="")  && (commentData.get("comment_referComment") != null)) {
 			Comment referComment = getCommentById(Integer.parseInt(commentData.get("comment_referComment")));
 			if(referComment != null)
 			comment.setComment_referComment(referComment);

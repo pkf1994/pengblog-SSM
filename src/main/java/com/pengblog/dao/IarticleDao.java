@@ -74,4 +74,6 @@ public interface IarticleDao {
 
 	int selectCountOfArticleByLabel(@Param("article_type")String article_type,
 									@Param("article_label")String article_label);
+
+
 }

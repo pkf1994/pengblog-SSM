@@ -10,11 +10,11 @@
 		<result column="comment_releaseTime" property="comment_releaseTime"/>
 		<result column="comment_haveSubComment" property="comment_haveSubComment"/>
 		<association property="comment_referComment"
-					javaType="Visitor"
+					javaType="com.pengblog.bean.Comment"
 					select="selectCommentById"
 					column="comment_refercomment"/>
 		<association property="comment_author"
-					javaType="Visitor"
+					javaType="com.pengblog.bean.Visitor"
 					select="selectVisitorById"
 					column="comment_author"/>
 		<association property="comment_hostArticle"
@@ -133,7 +133,7 @@
 					comment_releaseTime, 
 					comment_hostId)
 		VALUES(#{comment_author.visitor_id}, 
-				#{comment_referComment}, 
+				#{comment_referComment.comment_id}, 
 				#{comment_content}, 
 				#{comment_releaseTime},
 				#{comment_hostArticle.article_id})
@@ -178,4 +178,18 @@
 		WHERE
 			isdeleted = 0
 	</select>
+	
+	<update id="updateComment">
+		UPDATE 
+			comment
+		SET
+			comment_author = #{comment_author.visitor_id},
+			comment_referComment = #{comment_referComment.comment_id},
+			comment_content = #{comment_content},
+			comment_releaseTime = #{comment_releaseTime},
+			comment_hostId = #{comment_hostArticle.article_id},
+			comment_haveSubComment = #{comment_haveSubComment}
+		WHERE
+			comment_id = #{comment_id}
+	</update>
 </mapper>

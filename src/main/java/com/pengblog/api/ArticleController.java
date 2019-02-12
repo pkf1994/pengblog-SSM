@@ -53,6 +53,19 @@ public class ArticleController {
 		return retJson;
 	}
 	
+	@RequestMapping(value="/draft.do",produces="application/json;charset=UTF-8")
+	@ResponseBody
+	public Object getDraft() {
+		
+		Article draft = articleService.getDraft();
+		
+		Gson gson = new Gson();
+		
+		String retJson = gson.toJson(draft);
+		
+		return retJson;
+	}
+	
 	@RequestMapping(value="/article.do",produces="application/json;charset=UTF-8")
 	@ResponseBody
 	public Object getArticle(int article_id) {
@@ -66,7 +79,8 @@ public class ArticleController {
 		return retJson;
 	}
 	
-	@RequireToken
+	
+	
 	@RequestMapping(value="/upload_article.do", produces="application/json;charset=UTF-8")
 	@ResponseBody
 	public Object uploadArticle(@RequestBody Map<String,String> articleData) {
@@ -77,13 +91,14 @@ public class ArticleController {
 			articleService.saveArticle(article);
 		}
 		
-		Article handledArticle = articleService.handleImageUrl(article);
+		if(article.getArticle_type() == "article") {
+			article = articleService.handleImageUrl(article);
+			articleService.handlePreviewImage(article);
+		}
 		
-		articleService.handlePreviewImage(handledArticle);
+		articleService.updateArticle(article);
 		
-		articleService.updateArticle(handledArticle);
-		
-		return handledArticle.getArticle_id();
+		return article.getArticle_id();
 	}
 	
 	@RequireToken

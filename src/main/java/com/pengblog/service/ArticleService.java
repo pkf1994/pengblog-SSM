@@ -121,30 +121,37 @@ public class ArticleService implements IarticleService{
 			article.setArticle_label(articleData.get("article_label"));
 		}
 		
-		if(articleData.containsKey("article_content") && (articleData.get("article_content")!="")) {
+		
+		
+		if(articleData.containsKey("article_content")) {
 			
-			article.setArticle_content(articleData.get("article_content"));
-			
-			String article_content = article.getArticle_content();
-			
-			Document doc = Jsoup.parse(article_content);
-			
-			String article_content_text = doc.body().text();
-			
-			int length = article_content_text.length();
-			
-			if(length <= 200) {
-				
-				String article_summary = article_content_text;
-				
-				article.setArticle_summary(article_summary);
-				
+			if(articleData.get("article_content") == "") {
+				article.setArticle_content("");
+				article.setArticle_summary("");
 			}else {
-				String article_summary = article_content_text.substring(0,200);
 				
-				article.setArticle_summary(article_summary);
+				article.setArticle_content(articleData.get("article_content"));
+				
+				String article_content = article.getArticle_content();
+				
+				Document doc = Jsoup.parse(article_content);
+				
+				String article_content_text = doc.body().text();
+				
+				int length = article_content_text.length();
+				
+				if(length <= 200) {
+					
+					String article_summary = article_content_text;
+					
+					article.setArticle_summary(article_summary);
+					
+				}else {
+					String article_summary = article_content_text.substring(0,200);
+					
+					article.setArticle_summary(article_summary);
+				}
 			}
-			
 		}
 		
 		if(articleData.containsKey("article_type") && (articleData.get("article_type")!="")) {
@@ -157,6 +164,10 @@ public class ArticleService implements IarticleService{
 	}
 
 	public Article handleImageUrl(Article article) {
+		
+		if(article.getArticle_content() == null || article.getArticle_content() == "") {
+			return article;
+		}
 		
 		List<String> imgUrls = MyHtmlUtil.extractImageUrlFromArticleContent(article.getArticle_content());
 		
@@ -469,6 +480,10 @@ public class ArticleService implements IarticleService{
 	@Override
 	public Article handlePreviewImage(Article article) {
 		
+		if(article.getArticle_content() == null || article.getArticle_content() == "") {
+			return article;
+		}
+		
 		String article_content = article.getArticle_content();
 		
 		Document doc = Jsoup.parse(article_content);
@@ -520,7 +535,26 @@ public class ArticleService implements IarticleService{
 		return countOfAllArticle;
 	}
 
-	
-	
+	@Override
+	public Article getDraft() {
+		
+		List<String> paramList = new ArrayList<>();
+		
+		paramList.add("article_id");
+		paramList.add("article_title");
+		paramList.add("article_author");
+		paramList.add("article_releaseTime");
+		paramList.add("article_label");
+		paramList.add("article_previewImageUrl");
+		paramList.add("article_content");
+			
+		Article[] articleList = articleDao.selectArticleListByLimitIndex(0,1,paramList,"draft");
+		
+		if(articleList.length == 0) {
+			return new Article();
+		}
+		
+		return articleList[0];
+	}
 	
 }

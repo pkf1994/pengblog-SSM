@@ -6,7 +6,7 @@ public class ErrorInfo {
 	
 	private String msg;
 	
-	private Object erroe;
+	private Object error;
 
 	public boolean isSuccess() {
 		return success;
@@ -24,19 +24,19 @@ public class ErrorInfo {
 		this.msg = msg;
 	}
 
-	public Object getErroe() {
-		return erroe;
+	public Object getError() {
+		return error;
 	}
 
-	public void setErroe(Object erroe) {
-		this.erroe = erroe;
+	public void setError(Object error) {
+		this.error = error;
 	}
 
-	public ErrorInfo(boolean success, String msg, Object erroe) {
+	public ErrorInfo(boolean success, String msg, Object error) {
 		super();
 		this.success = success;
 		this.msg = msg;
-		this.erroe = erroe;
+		this.error = error;
 	}
 
 	public ErrorInfo() {

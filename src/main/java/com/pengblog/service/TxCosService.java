@@ -142,6 +142,8 @@ public class TxCosService implements ItxCosService{
 				
 				String imgName = tempImgName.replace("temp/", article_id + "/");
 				
+			
+				
 				this.moveImage(blogImageBucket, tempImgName, blogImageBucket, imgName);
 				
 				logger.info(LogUtil.infoBegin);

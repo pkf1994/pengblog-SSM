@@ -40,5 +40,7 @@ public interface IcommentDao {
 
 	Comment[] selectSubCommentListByLimitIndex(@Param("comment_id")int comment_id, @Param("startIndex")int startIndex, @Param("pageScale")int pageScale);
 
+	void updateComment(Comment referComment);
+
 	
 }

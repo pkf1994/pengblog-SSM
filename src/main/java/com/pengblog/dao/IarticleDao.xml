@@ -210,4 +210,5 @@
 		AND
 			isdeleted = 0
 	</select>
+
 </mapper>
