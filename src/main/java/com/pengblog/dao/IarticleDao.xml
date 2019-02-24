@@ -49,7 +49,8 @@
 					article_content,
 					article_releaseTime,
 					article_type, 
-					article_previewImageUrl)
+					article_previewImageUrl,
+					article_titleImageUrl)
 		VALUES(#{article_title}, 
 				#{article_author}, 
 				#{article_label}, 
@@ -57,7 +58,8 @@
 				#{article_content},
 				#{article_releaseTime},
 				#{article_type}, 
-				#{article_previewImageUrl})
+				#{article_previewImageUrl},
+				#{article_titleImageUrl})
 		<selectKey resultType="int" keyProperty="article_id" order="AFTER">
 			select @@identity
 		</selectKey>
@@ -83,7 +85,8 @@
 			article_content = #{article_content},
 			article_releaseTime = #{article_releaseTime},
 			article_type = #{article_type},
-			article_previewImageUrl = #{article_previewImageUrl}
+			article_previewImageUrl = #{article_previewImageUrl},
+			article_titleImageUrl = #{article_titleImageUrl}
 		WHERE
 			article_id = #{article_id}
 	</update>
@@ -126,8 +129,8 @@
 			article_type =  #{article_type}
 		AND
 			isdeleted = 0
-		AND
-		<foreach collection="searchWords" open="" close="" separator="or" item="word">
+		AND 
+		<foreach collection="searchWords" open="(" close=")" separator="or" item="word">
 				article_title LIKE  CONCAT('%',#{word},'%') 
 				or 
 				article_author  LIKE CONCAT('%',#{word},'%') 
@@ -149,7 +152,7 @@
 		AND
 			isdeleted = 0
 		AND
-		<foreach collection="searchWords" open="" close="" separator="or" item="word">
+		<foreach collection="searchWords" open="(" close=")" separator="or" item="word">
 				article_title LIKE  CONCAT('%',#{word},'%') 
 				or 
 				article_author  LIKE CONCAT('%',#{word},'%') 
@@ -168,9 +171,9 @@
 		WHERE
 			article_type =  #{article_type}
 		AND
-			article_releaseTime > #{beginDate}
+			article_releaseTime >= #{beginDate}
 		AND
-			#{endDate} >= article_releaseTime
+			#{endDate} > article_releaseTime
 		AND
 			isdeleted = 0
 		ORDER BY 

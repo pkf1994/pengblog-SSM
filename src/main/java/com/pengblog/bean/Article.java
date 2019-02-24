@@ -27,6 +27,8 @@ public class Article implements Serializable{
 	private String article_type;
 	
 	private String article_previewImageUrl;
+	
+	private String article_titleImageUrl;
 
 	/**
 	 * @return the article_id
@@ -147,11 +149,19 @@ public class Article implements Serializable{
 		this.article_previewImageUrl = article_previewImageUrl;
 	}
 
-	
+	public String getArticle_titleImageUrl() {
+		return article_titleImageUrl;
+	}
+
+	public void setArticle_titleImageUrl(String article_titleImageUrl) {
+		this.article_titleImageUrl = article_titleImageUrl;
+	}
+
+
 
 	public Article(Integer article_id, String article_title, String article_author, String article_content,
 			String article_summary, Date article_releaseTime, String article_label, String article_type,
-			String article_previewImageUrl) {
+			String article_previewImageUrl, String article_titleImageUrl) {
 		super();
 		this.article_id = article_id;
 		this.article_title = article_title;
@@ -162,6 +172,7 @@ public class Article implements Serializable{
 		this.article_label = article_label;
 		this.article_type = article_type;
 		this.article_previewImageUrl = article_previewImageUrl;
+		this.article_titleImageUrl = article_titleImageUrl;
 	}
 
 	/**

@@ -63,6 +63,7 @@ public class ArticleService implements IarticleService{
 		paramList.add("article_releaseTime");
 		paramList.add("article_label");
 		paramList.add("article_previewImageUrl");
+		paramList.add("article_titleImageUrl");
 
 			
 		Article[] articleList = articleDao.selectArticleListByLimitIndex(startIndex,pageScale,paramList,"article");
@@ -121,8 +122,6 @@ public class ArticleService implements IarticleService{
 			article.setArticle_label(articleData.get("article_label"));
 		}
 		
-		
-		
 		if(articleData.containsKey("article_content")) {
 			
 			if(articleData.get("article_content") == "") {
@@ -158,6 +157,10 @@ public class ArticleService implements IarticleService{
 			article.setArticle_type(articleData.get("article_type"));
 		}
 		
+		if(articleData.containsKey("article_titleImageUrl")) {
+			article.setArticle_titleImageUrl(articleData.get("article_titleImageUrl"));
+		}
+		
 		article.setArticle_releaseTime(new Date());
 		
 		return article;
@@ -171,6 +174,12 @@ public class ArticleService implements IarticleService{
 		
 		List<String> imgUrls = MyHtmlUtil.extractImageUrlFromArticleContent(article.getArticle_content());
 		
+		String titleImageUrl = article.getArticle_titleImageUrl();
+		
+		if(titleImageUrl != null && titleImageUrl != "") {
+			imgUrls.add(titleImageUrl);
+		}
+		
 		//List<String> handledImgUrls = qiniuService.handleImageUrl(imgUrls, article.getArticle_id());
 		
 		List<String> handledImgUrls = txCosService.transferTempImageUrlList(imgUrls, article.getArticle_id());
@@ -182,6 +191,10 @@ public class ArticleService implements IarticleService{
 		}
 		
 		article.setArticle_content(article_content);
+		
+		if(titleImageUrl != null && titleImageUrl != "") {
+			article.setArticle_titleImageUrl(handledImgUrls.get(handledImgUrls.size()-1));
+		}
 		
 		return article;
 	}
@@ -287,6 +300,15 @@ public class ArticleService implements IarticleService{
 			
 			tempCalendarEndY.set(yearNow - i + 1, 0, 1);
 			
+			tempCalendarBeginY.set(Calendar.HOUR_OF_DAY, 0);
+			tempCalendarBeginY.set(Calendar.MINUTE, 0);
+			tempCalendarBeginY.set(Calendar.SECOND, 0);
+			tempCalendarBeginY.set(Calendar.MILLISECOND, 0);
+			tempCalendarEndY.set(Calendar.HOUR_OF_DAY, 0);
+			tempCalendarEndY.set(Calendar.MINUTE, 0);
+			tempCalendarEndY.set(Calendar.SECOND, 0);
+			tempCalendarEndY.set(Calendar.MILLISECOND, 0);
+			
 			Date tempDateBeginY = tempCalendarBeginY.getTime();
 			
 			Date tempDateEndY = tempCalendarEndY.getTime();
@@ -302,10 +324,19 @@ public class ArticleService implements IarticleService{
 					Calendar tempCalendarBeginM = Calendar.getInstance();
 					
 					Calendar tempCalendarEndM = Calendar.getInstance();
-					
+				
 					tempCalendarBeginM.set(yearNow - i, j, 1);
 					
 					tempCalendarEndM.set(yearNow - i, j + 1, 1);
+					
+					tempCalendarBeginM.set(Calendar.HOUR_OF_DAY, 0);
+					tempCalendarBeginM.set(Calendar.MINUTE, 0);
+					tempCalendarBeginM.set(Calendar.SECOND, 0);
+					tempCalendarBeginM.set(Calendar.MILLISECOND, 0);
+					tempCalendarEndM.set(Calendar.HOUR_OF_DAY, 0);
+					tempCalendarEndM.set(Calendar.MINUTE, 0);
+					tempCalendarEndM.set(Calendar.SECOND, 0);
+					tempCalendarEndM.set(Calendar.MILLISECOND, 0);
 					
 					Date tempDateBeginM = tempCalendarBeginM.getTime();
 					
@@ -348,6 +379,8 @@ public class ArticleService implements IarticleService{
 		paramList.add("article_summary");
 		paramList.add("article_releaseTime");
 		paramList.add("article_label");
+		paramList.add("article_previewImageUrl");
+		paramList.add("article_titleImageUrl");
 	
 		Article[] articles = articleDao.selectArticleByLimitIndexAndSearchWords(startIndex,pageScale,paramList,"article",searchWords);
 		
@@ -373,16 +406,41 @@ public class ArticleService implements IarticleService{
 	}
 
 	@Override
-	public Article[] getArticleItemListByLimitIndexAndYearAndMonth(int startIndex, int pageScale, String selectedYear,
-			String selectedMonth) {
+	public Article[] getArticleItemListByLimitIndexAndYearAndMonth( int startIndex, 
+																	int pageScale, 
+																	String selectedYear,
+																	String selectedMonth) {
 		
 		Calendar beginCal = Calendar.getInstance();
 		
 		Calendar endCal = Calendar.getInstance();
 		
-		beginCal.set(Integer.parseInt(selectedYear), Integer.parseInt(selectedMonth) - 1, 1);
+		if(selectedMonth == null || selectedMonth.equals("")) {
+			
+			beginCal.set(Integer.parseInt(selectedYear), 0, 1);
+			
+			endCal.set(Integer.parseInt(selectedYear), 11, 30);
+			
+		}else {
+			
+			beginCal.set(Integer.parseInt(selectedYear), Integer.parseInt(selectedMonth) - 1, 1);
+			
+			endCal.set(Integer.parseInt(selectedYear), Integer.parseInt(selectedMonth), 1);
+			
+			if(Integer.parseInt(selectedMonth) == 2) {
+				
+				endCal.set(Integer.parseInt(selectedYear), Integer.parseInt(selectedMonth) - 1, 28);
+			}
+		}
 		
-		endCal.set(Integer.parseInt(selectedYear), Integer.parseInt(selectedMonth), 1);
+		beginCal.set(Calendar.HOUR_OF_DAY, 0);
+		beginCal.set(Calendar.MINUTE, 0);
+		beginCal.set(Calendar.SECOND, 0);
+		beginCal.set(Calendar.MILLISECOND, 0);
+		endCal.set(Calendar.HOUR_OF_DAY, 0);
+		endCal.set(Calendar.MINUTE, 0);
+		endCal.set(Calendar.SECOND, 0);
+		endCal.set(Calendar.MILLISECOND, 0);
 		
 		Date beginDate = beginCal.getTime();
 		
@@ -408,9 +466,32 @@ public class ArticleService implements IarticleService{
 		
 		Calendar endCal = Calendar.getInstance();
 		
-		beginCal.set(Integer.parseInt(selectedYear), Integer.parseInt(selectedMonth) - 1, 1);
+		if(selectedMonth == null || selectedMonth.equals("")) {
+			
+			beginCal.set(Integer.parseInt(selectedYear), 0, 1);
+			
+			endCal.set(Integer.parseInt(selectedYear), 11, 30);
+			
+		}else {
+			
+			beginCal.set(Integer.parseInt(selectedYear), Integer.parseInt(selectedMonth) - 1, 1);
+			
+			endCal.set(Integer.parseInt(selectedYear), Integer.parseInt(selectedMonth), 1);
+			
+			if(Integer.parseInt(selectedMonth) == 2) {
+				
+				endCal.set(Integer.parseInt(selectedYear), Integer.parseInt(selectedMonth) - 1, 28);
+			}
+		}
 		
-		endCal.set(Integer.parseInt(selectedYear), Integer.parseInt(selectedMonth), 1);
+		beginCal.set(Calendar.HOUR_OF_DAY, 0);
+		beginCal.set(Calendar.MINUTE, 0);
+		beginCal.set(Calendar.SECOND, 0);
+		beginCal.set(Calendar.MILLISECOND, 0);
+		endCal.set(Calendar.HOUR_OF_DAY, 0);
+		endCal.set(Calendar.MINUTE, 0);
+		endCal.set(Calendar.SECOND, 0);
+		endCal.set(Calendar.MILLISECOND, 0);
 		
 		Date beginDate = beginCal.getTime();
 		
@@ -430,9 +511,32 @@ public class ArticleService implements IarticleService{
 		
 		Calendar endCal = Calendar.getInstance();
 		
-		beginCal.set(Integer.parseInt(selectedYear), Integer.parseInt(selectedMonth) - 1, 1);
+		if(selectedMonth == null || selectedMonth.equals("")) {
+			
+			beginCal.set(Integer.parseInt(selectedYear), 0, 1);
+			
+			endCal.set(Integer.parseInt(selectedYear), 11, 30);
+			
+		}else {
+			
+			beginCal.set(Integer.parseInt(selectedYear), Integer.parseInt(selectedMonth) - 1, 1);
+			
+			endCal.set(Integer.parseInt(selectedYear), Integer.parseInt(selectedMonth), 1);
+			
+			if(Integer.parseInt(selectedMonth) == 2) {
+				
+				endCal.set(Integer.parseInt(selectedYear), Integer.parseInt(selectedMonth) - 1, 28);
+			}
+		}
 		
-		endCal.set(Integer.parseInt(selectedYear), Integer.parseInt(selectedMonth), 1);
+		beginCal.set(Calendar.HOUR_OF_DAY, 0);
+		beginCal.set(Calendar.MINUTE, 0);
+		beginCal.set(Calendar.SECOND, 0);
+		beginCal.set(Calendar.MILLISECOND, 0);
+		endCal.set(Calendar.HOUR_OF_DAY, 0);
+		endCal.set(Calendar.MINUTE, 0);
+		endCal.set(Calendar.SECOND, 0);
+		endCal.set(Calendar.MILLISECOND, 0);
 		
 		Date beginDate = beginCal.getTime();
 		
@@ -504,7 +608,13 @@ public class ArticleService implements IarticleService{
 			article.setArticle_summary(article_summary);
 		}
 		
-		if(doc.select("img[src]").size() > 0) {
+		if(article.getArticle_titleImageUrl() != null && article.getArticle_titleImageUrl() != "") {
+			
+			String article_previewImageUrl = txCosService.thumbnail(article.getArticle_titleImageUrl());
+			
+			article.setArticle_previewImageUrl(article_previewImageUrl);
+			
+		}else if(doc.select("img[src]").size() > 0) {
 			
 			String article_firstImageUrl = doc.select("img[src]").first().attr("src");
 			
@@ -512,8 +622,7 @@ public class ArticleService implements IarticleService{
 			
 			String article_previewImageUrl = txCosService.thumbnail(article_firstImageUrl);
 			
-			article.setArticle_previewImageUrl(article_previewImageUrl);
-			
+			article.setArticle_previewImageUrl(article_previewImageUrl);	
 		}
 		
 		return article;
@@ -547,6 +656,7 @@ public class ArticleService implements IarticleService{
 		paramList.add("article_label");
 		paramList.add("article_previewImageUrl");
 		paramList.add("article_content");
+		paramList.add("article_titleImageUrl");
 			
 		Article[] articleList = articleDao.selectArticleListByLimitIndex(0,1,paramList,"draft");
 		

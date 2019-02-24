@@ -41,7 +41,7 @@
  		<logger name="org.mybatis" level="INFO"></logger>
        <Root level="all">
  			<AppenderRef ref="RollingFile" level="info"/>
-          	<AppenderRef ref="Console" />
+          	<AppenderRef ref="Console" level="debug"/>
           	<AppenderRef ref="RollingFileError"/>
        </Root>
     </Loggers>

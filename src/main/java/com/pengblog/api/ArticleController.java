@@ -87,13 +87,14 @@ public class ArticleController {
 		
 		Article article = articleService.constructArticle(articleData);
 		
-		if(article.getArticle_id() == 0) {
+
+ 		if(article.getArticle_id() == null || article.getArticle_id() == 0) {
 			articleService.saveArticle(article);
 		}
 		
-		if(article.getArticle_type() == "article") {
-			article = articleService.handleImageUrl(article);
+		if(article.getArticle_type().equals("article")) {
 			articleService.handlePreviewImage(article);
+			article = articleService.handleImageUrl(article);
 		}
 		
 		articleService.updateArticle(article);
