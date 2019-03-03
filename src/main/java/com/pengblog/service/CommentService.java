@@ -134,9 +134,7 @@ public class CommentService implements IcommentService{
 	}
 
 	@Override
-	public List<Comment> getCommentLastListByLimitIndex(int currentPage, int pageScale) {
-		
-		int startIndex = (currentPage - 1) * pageScale;
+	public List<Comment> getCommentLastListByLimitIndex(int startIndex, int pageScale) {
 		
 		List<Comment> comments = commentDao.selectCommentLastListByLimitIndex(startIndex, pageScale);
 		

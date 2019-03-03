@@ -149,9 +149,9 @@ public class CommentController {
 	
 	@RequestMapping(value="/comment_last.do", produces="application/json;charset=UTF-8")
 	@ResponseBody
-	public Object getCommentLast(int currentPage, int pageScale) {
+	public Object getCommentLast(int startIndex, int pageScale) {
 		
-		List<Comment> comments = commentService.getCommentLastListByLimitIndex(currentPage, pageScale);
+		List<Comment> comments = commentService.getCommentLastListByLimitIndex(startIndex, pageScale);
 		
 		int maxPage = commentService.getMaxPageOfComment(pageScale);
 		

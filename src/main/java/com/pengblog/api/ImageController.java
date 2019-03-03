@@ -33,6 +33,7 @@ public class ImageController {
 	@Qualifier("txCosService")
 	private ItxCosService txCosService;
 	
+	@RequireToken
 	@RequestMapping(value="/image_upload.do", produces="application/json;charset=UTF-8")
 	@ResponseBody
 	public Object uploadImage(HttpServletRequest request, MultipartFile img) throws IOException {

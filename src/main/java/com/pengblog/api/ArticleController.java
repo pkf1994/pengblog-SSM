@@ -53,6 +53,7 @@ public class ArticleController {
 		return retJson;
 	}
 	
+	@RequireToken
 	@RequestMapping(value="/draft.do",produces="application/json;charset=UTF-8")
 	@ResponseBody
 	public Object getDraft() {
@@ -80,7 +81,7 @@ public class ArticleController {
 	}
 	
 	
-	
+	@RequireToken
 	@RequestMapping(value="/upload_article.do", produces="application/json;charset=UTF-8")
 	@ResponseBody
 	public Object uploadArticle(@RequestBody Map<String,String> articleData) {
@@ -129,6 +130,24 @@ public class ArticleController {
 	public Object deleteArticle(int article_id) {
 		
 		articleService.deleteArticleById(article_id);
+		
+		return "delete success";
+	}
+	
+	@RequireToken
+	@RequestMapping(value="/delete_article_list.do",produces="application/json;charset=UTF-8")
+	@ResponseBody
+	public Object deleteArticleList(@RequestBody Map<String,String> deleteArticleListData) {
+		
+		Gson gson = new Gson();
+		
+		int [] article_ids = gson.fromJson(deleteArticleListData.get("articleIdListString"), int[].class);
+		
+		for (int i = 0; i < article_ids.length; i++) {
+			
+			articleService.deleteArticleById(article_ids[i]);
+			
+		}
 		
 		return "delete success";
 	}

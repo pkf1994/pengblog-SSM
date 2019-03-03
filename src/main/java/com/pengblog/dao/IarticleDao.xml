@@ -36,8 +36,6 @@
 		  	article
 		WHERE
 			article_id = #{article_id}
-		AND
-			isdeleted = false
 	</select>
 	
 	<insert id="insertArticle">
