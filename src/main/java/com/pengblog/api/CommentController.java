@@ -151,6 +151,14 @@ public class CommentController {
 	@ResponseBody
 	public Object getCommentLast(int startIndex, int pageScale) {
 		
+		int countOfComment = commentService.getCountOfAllComment();
+		
+		if(countOfComment < startIndex) {
+			
+			return "no more item available";
+			
+		}
+		
 		List<Comment> comments = commentService.getCommentLastListByLimitIndex(startIndex, pageScale);
 		
 		int maxPage = commentService.getMaxPageOfComment(pageScale);

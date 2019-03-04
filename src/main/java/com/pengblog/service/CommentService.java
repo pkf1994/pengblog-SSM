@@ -228,5 +228,13 @@ public class CommentService implements IcommentService{
 		return subCommentList;
 	}
 
+	@Override
+	public int getCountOfAllComment() {
+		
+		int countOfComment = commentDao.selectCountOfComment();
+		
+		return countOfComment;
+	}
+
 
 }

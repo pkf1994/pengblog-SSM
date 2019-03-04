@@ -6,7 +6,7 @@ public interface IvisitorDao {
 
 	int insertVisitor(Visitor visitor);
 
-	Visitor selectVisitorByName(String visitor_name);
+	Visitor[] selectVisitorByName(String visitor_name);
 
 	void updateVisitor(Visitor visitor);
 

@@ -158,6 +158,8 @@
 			isdeleted = 1
 		WHERE
 			comment_id = #{comment_id}
+		OR 
+			comment_refercomment = #{comment_id}
 	</update>
 	
 	<select id="selectCommentLastListByLimitIndex" resultMap="commentMapper">

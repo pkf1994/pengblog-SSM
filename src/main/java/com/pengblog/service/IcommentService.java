@@ -51,5 +51,7 @@ public interface IcommentService {
 	int getCountOfSubComment(int comment_id);
 
 	Comment[] getSubCommentList(int comment_id, int startIndex, int pageScale);
+	
+	int getCountOfAllComment();
 
 }

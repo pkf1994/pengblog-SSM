@@ -20,21 +20,29 @@ public class VisitorService implements IvisitorService{
 	@Override
 	public Visitor saveVisitor(Visitor visitor) {
 		
-		Visitor _visitor = visitorDao.selectVisitorByName(visitor.getVisitor_name());
+		Visitor[] _visitors = visitorDao.selectVisitorByName(visitor.getVisitor_name());
 		
-		if(_visitor != null) {
+		if(_visitors != null) {
 			
-			if(_visitor.getVisitor_email().equals(visitor.getVisitor_email())) {
+			for (int i = 0; i < _visitors.length; i++) {
 				
-				visitor.setVisitor_id(_visitor.getVisitor_id());
+				if(_visitors[i].getVisitor_email().equals(visitor.getVisitor_email())) {
+					
+					return _visitors[i];
+				}
 				
-				visitorDao.updateVisitor(visitor);
 			}
+			
+			visitorDao.insertVisitor(visitor);
+			
+			logger.info(LogUtil.infoBegin);
+			logger.info("存储访客: " + visitor.getVisitor_name() + "-" + visitor.getVisitor_email());
+			logger.info(LogUtil.infoEnd);
 			
 			return visitor;
 		}
 		
-		int visitor_id = visitorDao.insertVisitor(visitor);
+		visitorDao.insertVisitor(visitor);
 		
 		logger.info(LogUtil.infoBegin);
 		logger.info("存储访客: " + visitor.getVisitor_name() + "-" + visitor.getVisitor_email());
