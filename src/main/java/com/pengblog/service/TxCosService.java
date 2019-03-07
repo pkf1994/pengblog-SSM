@@ -1,8 +1,6 @@
 package com.pengblog.service;
 
-import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
@@ -11,6 +9,8 @@ import java.util.Properties;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import com.pengblog.utils.LogUtil;
@@ -20,27 +20,14 @@ import com.qcloud.cos.ClientConfig;
 import com.qcloud.cos.auth.BasicCOSCredentials;
 import com.qcloud.cos.auth.COSCredentials;
 import com.qcloud.cos.model.CopyObjectRequest;
-import com.qcloud.cos.model.ObjectMetadata;
 import com.qcloud.cos.model.PutObjectRequest;
 import com.qcloud.cos.region.Region;
-
 
 @Service("txCosService")
 public class TxCosService implements ItxCosService{
 	
-	private static final Logger logger = LogManager.getLogger(QiniuService.class);
+	private static final Logger logger = LogManager.getLogger(TxCosService.class);
 	
-	private static String secretId;
-	
-	private static String secretKey;
-	
-	private static String region;
-	
-	private static COSCredentials cred;
-	
-	private static ClientConfig clientConfig;
-	
-	private static Properties properties;
 	
 	private static String cosDomainName;
 	
@@ -48,31 +35,20 @@ public class TxCosService implements ItxCosService{
 	
 	private static String thumbnail;
 	
+	private static String blogImageBucket;
+	
+	private static COSCredentials cosCredentials;
+	
+	private static ClientConfig clientConfig;
+	
+	
 	static {
+		/*
+		cosCredentials = new BasicCOSCredentials(secretId, secretKey);	
+		
+		clientConfig = new ClientConfig(new Region(region));*/
 		
 		
-		
-		//获取腾讯云COS配置
-		String propertiesPath = (TxCosService.class.getResource("/") + "txCos.properties").substring(5);
-		
-		//调用工具类加载配置文件
-		properties = MyFileUtil.loadProperties(propertiesPath);
-		
-		secretId = properties.getProperty("secretId");
-		
-		secretKey = properties.getProperty("secretKey");
-		
-		region = properties.getProperty("region");
-		
-		thumbnail = properties.getProperty("thumbnail");
-		
-		cosDomainName = properties.getProperty("cosDomainName");
-		
-		clDomainName = properties.getProperty("clDomainName");
-		
-		cred = new BasicCOSCredentials(secretId, secretKey);	
-		
-		clientConfig = new ClientConfig(new Region(region));
 		
 		/*//通过存储一个目录类“亚当”，来获取COSURL的path部分，以下部分代码参考官方SDK示例
 		COSClient cosClient = new COSClient(cred, clientConfig);
@@ -101,9 +77,8 @@ public class TxCosService implements ItxCosService{
 	@Override
 	public String uploadTempImage(File imageFile, String fileName) {
 		
-		COSClient cosClient = new COSClient(cred, clientConfig);
+		COSClient cosClient = new COSClient(cosCredentials, clientConfig);
 		
-		String blogImageBucket = properties.getProperty("blogImageBucket");
 		
 		fileName = "temp/" + fileName;
 		
@@ -126,9 +101,8 @@ public class TxCosService implements ItxCosService{
 	@Override
 	public List<String> transferTempImageUrlList(List<String> imgUrls, Integer article_id) {
 		
-		COSClient cosClient = new COSClient(cred, clientConfig);
+		COSClient cosClient = new COSClient(cosCredentials, clientConfig);
 		
-		String blogImageBucket = properties.getProperty("blogImageBucket");
 		
 		List<String> handledImgUrls = new ArrayList<>();
 		
@@ -164,7 +138,7 @@ public class TxCosService implements ItxCosService{
 
 	private void moveImage(String sourceBucketName, String sourceKey, String destinationBucketName, String destinationKey) {
 		
-		COSClient cosClient = new COSClient(cred, clientConfig);
+		COSClient cosClient = new COSClient(cosCredentials, clientConfig);
 		
 		if(sourceBucketName == destinationBucketName && sourceKey == destinationKey) {
 			return;
@@ -183,9 +157,7 @@ public class TxCosService implements ItxCosService{
 	@Override
 	public void deleteImage(List<String> imgUrlList, int article_id) {
 		
-		String blogImageBucket = properties.getProperty("blogImageBucket");
-		
-		COSClient cosClient = new COSClient(cred, clientConfig);
+		COSClient cosClient = new COSClient(cosCredentials, clientConfig);
 		
 		for(String imgUrl: imgUrlList) {
 			
@@ -215,5 +187,38 @@ public class TxCosService implements ItxCosService{
 		}
 		return article_firstImageUrl.replace(cosDomainName, clDomainName) + thumbnail;
 	}
+
+	
+	@Autowired
+	public void setCosDomainName(String cosDomainName) {
+		TxCosService.cosDomainName = cosDomainName;
+	}
+	
+	@Autowired
+	public void setClDomainName(String clDomainName) {
+		TxCosService.clDomainName = clDomainName;
+	}
+	
+	@Autowired
+	public void setThumbnail(String thumbnail) {
+		TxCosService.thumbnail = thumbnail;
+	}
+	
+	@Autowired
+	public void setBlogImageBucket(String blogImageBucket) {
+		TxCosService.blogImageBucket = blogImageBucket;
+	}
+	
+	@Autowired
+	public void setCosCredentials(COSCredentials cosCredentials) {
+		TxCosService.cosCredentials = cosCredentials;
+	}
+	
+	@Autowired
+	public void setClientConfig(ClientConfig clientConfig) {
+		TxCosService.clientConfig = clientConfig;
+	}
+	
+	
 
 }

@@ -16,8 +16,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.google.gson.Gson;
 import com.peng.annotation.RequireToken;
-import com.pengblog.service.IimageService;
-import com.pengblog.service.IqiniuService;
 import com.pengblog.service.ItxCosService;
 import com.pengblog.utils.MyFileUtil;
 
@@ -25,9 +23,6 @@ import com.pengblog.utils.MyFileUtil;
 @RequestMapping("/image")
 public class ImageController {
 	
-	@Autowired
-	@Qualifier("qiniuService")
-	private IqiniuService qiniuService;
 	
 	@Autowired
 	@Qualifier("txCosService")

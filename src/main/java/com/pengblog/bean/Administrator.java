@@ -47,8 +47,6 @@ public class Administrator {
 
 
 
-
-
 	public Administrator(Integer administrator_id, String administrator_username, String administrator_password,
 			Date administrator_saltDate) {
 		super();

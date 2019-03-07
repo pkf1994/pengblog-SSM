@@ -41,7 +41,12 @@
 			    <scope>provided</scope>
 			</dependency>
 			<!-- spring 依赖 begin -->
-		<dependency>
+			<dependency>
+	           	<groupId>org.springframework</groupId> 
+	           	<artifactId>spring-test</artifactId>
+	            <version>${spring.version}</version>
+	        </dependency>
+			<dependency>
 	            <groupId>org.springframework</groupId>
 	            <artifactId>spring-core</artifactId>
 	            <version>${spring.version}</version>
@@ -189,26 +194,6 @@
     </dependency>
     <!--log4j2完-->
 	 
-			
-			<!-- 七牛存储及其依赖 -->
-			<dependency>
-			  <groupId>com.qiniu</groupId>
-			  <artifactId>qiniu-java-sdk</artifactId>
-			  <version>[7.2.0, 7.2.99]</version>
-			  <scope>compile</scope>
-			</dependency>
-	 		<dependency>
-		      <groupId>com.squareup.okhttp3</groupId>
-		      <artifactId>okhttp</artifactId>
-		      <version>3.3.1</version>
-		      <scope>compile</scope>
-		    </dependency>
-		    <dependency>
-		      <groupId>com.qiniu</groupId>
-		      <artifactId>happy-dns-java</artifactId>
-		      <version>0.1.4</version>
-		      <scope>compile</scope>
-		    </dependency>
 		    
 		    <!-- 腾讯云存储 -->
 		    <dependency>
@@ -237,6 +222,28 @@
 			    <version>3.3.0</version>
 			</dependency>
 						
+						
+			<!-- spring-redis实现 -->
+			<dependency>
+			    <groupId>org.springframework.data</groupId>
+			    <artifactId>spring-data-redis</artifactId>
+			    <version>1.6.2.RELEASE</version>
+			</dependency>
+			
+			
+			<!-- redis客户端jar -->
+			<dependency>
+			    <groupId>redis.clients</groupId>
+			    <artifactId>jedis</artifactId>
+			    <version>2.8.0</version>
+			</dependency>
+			
+			<!-- 谷歌验证码 -->
+			<dependency>
+			    <groupId>com.github.penggle</groupId>
+			    <artifactId>kaptcha</artifactId>
+			    <version>2.3.2</version>
+			</dependency>
 		
        	</dependencies>
 </project>

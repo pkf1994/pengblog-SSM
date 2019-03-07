@@ -32,8 +32,7 @@
 	        <property name="maxStatements" value="200"/>
 		</bean>
 		
-		<!-- 注册数据库四要素配置文件地址 -->
-		<context:property-placeholder location="classpath:jdbc.properties"/>
+		
         
         
 </beans>

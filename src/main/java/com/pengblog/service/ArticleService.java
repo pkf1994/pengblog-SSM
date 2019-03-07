@@ -39,11 +39,7 @@ public class ArticleService implements IarticleService{
 	
 	@Autowired
 	private IcommentDao commentDao;
-	
-	@Autowired
-	@Qualifier("qiniuService")
-	private IqiniuService qiniuService;
-	
+
 	@Autowired
 	@Qualifier("txCosService")
 	private ItxCosService txCosService;
@@ -94,6 +90,7 @@ public class ArticleService implements IarticleService{
 	 * @see com.pengblog.service.IarticleService#getArticleById(int)
 	 */
 	@Override
+	@Transactional
 	public Article getArticleById(int article_id) {
 		
 		Article article = articleDao.selectArticleById(article_id);
@@ -102,6 +99,7 @@ public class ArticleService implements IarticleService{
 	}
 
 	@Override
+	@Transactional
 	public Article constructArticle(Map<String, String> articleData) {
 		
 		Article article = new Article();
@@ -166,6 +164,7 @@ public class ArticleService implements IarticleService{
 		return article;
 	}
 
+	@Transactional
 	public Article handleImageUrl(Article article) {
 		
 		if(article.getArticle_content() == null || article.getArticle_content() == "") {
@@ -199,7 +198,7 @@ public class ArticleService implements IarticleService{
 		return article;
 	}
 
-	@Override
+	@Transactional
 	public int saveArticle(Article article) {
 		
 		int article_id = articleDao.insertArticle(article);
@@ -211,7 +210,7 @@ public class ArticleService implements IarticleService{
 		return article_id;
 	}
 
-	@Override
+	@Transactional
 	public Article[] getDraftList(int startIndex, int pageScale) {
 		
 		List<String> paramList = new ArrayList<>();
@@ -226,7 +225,7 @@ public class ArticleService implements IarticleService{
 		return articleList;
 	}
 
-	@Override
+	@Transactional
 	public int getMaxPageOfDraft(int pageScale) {
 		
 		int countOfAllArticle = articleDao.selectCountOfArticle("draft");
@@ -236,7 +235,7 @@ public class ArticleService implements IarticleService{
 		return maxPage;
 	}
 
-	@Override
+	@Transactional
 	public void deleteArticleById(int article_id) {
 		Article article = getArticleById(article_id);
 		
@@ -270,7 +269,7 @@ public class ArticleService implements IarticleService{
 		
 	}
 
-	@Override
+	@Transactional
 	public void updateArticle(Article handledArticle) {
 		
 		articleDao.updateArticle(handledArticle);
@@ -281,7 +280,7 @@ public class ArticleService implements IarticleService{
 		
 	}
 
-	@Override
+	@Transactional
 	public Map<Integer, Object> getArticleFiling() {
 		
 		Map<Integer, Object> retMap = new HashMap<>();
@@ -358,7 +357,7 @@ public class ArticleService implements IarticleService{
 	}
 
 
-	@Override
+	@Transactional
 	public List<Map<String, Integer>> getArticleLabelList() {
 
 		List<Map<String, Integer>> articleLabelList = articleDao.selectArticleLabelList();
@@ -366,7 +365,7 @@ public class ArticleService implements IarticleService{
 		return articleLabelList;
 	}
 
-	@Override
+	@Transactional
 	public Article[] getArticleItemListByLimitIndexAndSearchWords(int startIndex, int pageScale,
 			String[] searchWords) {
 		
@@ -387,7 +386,7 @@ public class ArticleService implements IarticleService{
 		return articles;
 	}
 
-	@Override
+	@Transactional
 	public int getMaxPageBySearchWords(int pageScale, String[] searchWords) {
 		
 		int countOfAllArticleBySearchWords = articleDao.selectCountOfArticleBySearchWords("article",searchWords);
@@ -397,7 +396,7 @@ public class ArticleService implements IarticleService{
 		return maxPage;
 	}
 
-	@Override
+	@Transactional
 	public int getCountOfArticleBySearchWords(String[] searchWords) {
 		
 		int countOfAllArticleBySearchWords = articleDao.selectCountOfArticleBySearchWords("article",searchWords);
@@ -405,7 +404,7 @@ public class ArticleService implements IarticleService{
 		return countOfAllArticleBySearchWords;
 	}
 
-	@Override
+	@Transactional
 	public Article[] getArticleItemListByLimitIndexAndYearAndMonth( int startIndex, 
 																	int pageScale, 
 																	String selectedYear,
@@ -459,7 +458,7 @@ public class ArticleService implements IarticleService{
 		return articles;
 	}
 
-	@Override
+	@Transactional
 	public int getMaxPageByYearAndMonth(int pageScale, String selectedYear, String selectedMonth) {
 		
 		Calendar beginCal = Calendar.getInstance();
@@ -504,7 +503,7 @@ public class ArticleService implements IarticleService{
 		return maxPage;
 	}
 
-	@Override
+	@Transactional
 	public int getCountOfArticleByYearAndMonth(String selectedYear, String selectedMonth) {
 		
 		Calendar beginCal = Calendar.getInstance();
@@ -547,7 +546,7 @@ public class ArticleService implements IarticleService{
 		return countOfAllArticleByLimitDate;
 	}
 
-	@Override
+	@Transactional
 	public Article[] getArticleItemListByLimitIndexAndLabel(int startIndex, int pageScale, String article_label) {
 
 		List<String> paramList = new ArrayList<>();
@@ -563,7 +562,7 @@ public class ArticleService implements IarticleService{
 		return articles;
 	}
 
-	@Override
+	@Transactional
 	public int getMaxPageByLabel(int pageScale, String article_label) {
 		
 		int countOfAllArticleByLabel = articleDao.selectCountOfArticleByLabel("article",article_label);
@@ -573,7 +572,7 @@ public class ArticleService implements IarticleService{
 		return maxPage;
 	}
 
-	@Override
+	@Transactional
 	public int getCountOfArticleByLabel(String article_label) {
 		
 		int countOfAllArticleByLabel = articleDao.selectCountOfArticleByLabel("article",article_label);
@@ -581,7 +580,7 @@ public class ArticleService implements IarticleService{
 		return countOfAllArticleByLabel;
 	}
 
-	@Override
+	@Transactional
 	public Article handlePreviewImage(Article article) {
 		
 		if(article.getArticle_content() == null || article.getArticle_content() == "") {
@@ -629,14 +628,14 @@ public class ArticleService implements IarticleService{
 		
 	}
 
-	
+	@Transactional
 	public int getCountOfArticle() {
 		
 		return getCountOfArticle("article");
 		
 	}
 
-	@Override
+	@Transactional
 	public int getCountOfArticle(String article_type) {
 		
 		int countOfAllArticle = articleDao.selectCountOfArticle("article");
@@ -644,7 +643,7 @@ public class ArticleService implements IarticleService{
 		return countOfAllArticle;
 	}
 
-	@Override
+	@Transactional
 	public Article getDraft() {
 		
 		List<String> paramList = new ArrayList<>();

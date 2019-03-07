@@ -3,6 +3,9 @@
   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.pengblog.dao.IarticleDao">
+
+	<cache type="com.pengblog.redis.RedisCache"/>
+
 	<!-- 根据参数列表获取 -->
 	<select id="selectArticleListByLimitIndex" resultType="Article">
 		SELECT 
