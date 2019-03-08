@@ -1,5 +1,6 @@
 package com.pengblog.utils;
 
+import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -8,12 +9,15 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Properties;
 
-
+import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.fileupload.disk.DiskFileItem;
+import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.commons.CommonsMultipartFile;
+
+import sun.misc.BASE64Encoder;
 
 
 public class MyFileUtil {
@@ -69,5 +73,13 @@ public class MyFileUtil {
 			e.printStackTrace();
 		}
 	    return properties;
+    }
+    
+    public static String transferBufferedImageToBase64(BufferedImage image) throws IOException {
+    	ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+ 	    ImageIO.write(image, "jpg", outputStream);
+ 	    BASE64Encoder encoder = new BASE64Encoder();
+ 	    String base64Img = encoder.encode(outputStream.toByteArray());
+ 	    return base64Img;
     }
 }

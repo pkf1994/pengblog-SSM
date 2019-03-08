@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.google.gson.Gson;
+import com.pengblog.service.IcaptchaService;
 import com.pengblog.service.IloginService;
 
 @Controller
@@ -21,6 +22,10 @@ public class LoginController {
 	@Qualifier("loginService")
 	private IloginService loginService;
 	
+	@Autowired
+	@Qualifier("captchaService")
+	private IcaptchaService captchaService;
+	
 	@RequestMapping(value="/login.do", produces="application/json;charset=utf-8")
 	@ResponseBody
 	public Object login(@RequestBody Map<String,String> loginInfo) {
@@ -29,7 +34,29 @@ public class LoginController {
 		
 		String password = loginInfo.get("password");
 		
-		Map<String,Object> loginMap = loginService.login(username, password);
+		String captchaId = loginInfo.get("captchaId");
+		
+		String captchaCode = loginInfo.get("captchaCode");
+		
+		Map<String, Object> checkResultMap = captchaService.checkCaptchaCode(captchaId,captchaCode);
+		
+		Map<String,Object> loginMap = new HashMap<>();
+		
+		if((Boolean)checkResultMap.get("pass") == false) {
+			
+			loginMap.put("loginStatus", 0);
+			
+			loginMap.put("loginMsg", "绕过验证码的非法登录");
+			
+			Gson gson = new Gson();
+			
+			String retJson = gson.toJson(loginMap);
+			
+			return retJson;
+			
+		}
+		
+		loginMap = loginService.login(username, password);
 		
 		Gson gson = new Gson();
 		
