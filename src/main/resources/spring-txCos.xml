@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:tx="http://www.springframework.org/schema/tx" xmlns:jdbc="http://www.springframework.org/schema/jdbc"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xsi:schemaLocation="
+     http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd
+     http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+     http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc-3.0.xsd
+     http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.0.xsd
+     http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.0.xsd
+     http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd">
+     
+  	
+  	<bean id="txCosService" class="com.pengblog.service.TxCosService">
+	    <property name="thumbnail" value="${txCos.thumbnail}"/>
+	    <property name="cosDomainName" value="${txCos.cosDomainName}"/>
+	    <property name="clDomainName" value="${txCos.clDomainName}"/>
+	    <property name="blogImageBucket" value="${txCos.blogImageBucket}"/>
+	    <property name="cosCredentials" ref="basicCOSCredentials"/>
+	    <property name="clientConfig" ref="clientConfig"/>
+  	</bean>
+  	
+  	<bean id="basicCOSCredentials" class="com.qcloud.cos.auth.BasicCOSCredentials">
+  		<constructor-arg  index="0" value="${txCos.secretId}"/>
+	    <constructor-arg  index="1" value="${txCos.secretKey}"/>
+  	</bean>
+  	
+  	<bean id="region" class="com.qcloud.cos.region.Region">
+  		<constructor-arg  index="0" value="${txCos.region}"/>
+	    <constructor-arg  index="1" value="${txCos.region}"/>
+  	</bean>
+  	
+  	<bean id="clientConfig" class="com.qcloud.cos.ClientConfig">
+  		<property name="region" ref="region"/>
+  	</bean>
+  
+</beans>
