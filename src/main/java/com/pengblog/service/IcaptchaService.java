@@ -1,12 +1,13 @@
 package com.pengblog.service;
 
 import java.awt.image.BufferedImage;
-import java.util.Map;
+
+import com.pengblog.bean.CaptchaResult;
 
 public interface IcaptchaService {
 
 	BufferedImage generateCaptchaImage(String captchaId);
 
-	Map<String, Object> checkCaptchaCode(String captchaId, String uncheckCaptchaCode);
+	CaptchaResult checkCaptchaCode(String captchaId, String uncheckCaptchaCode);
 
 }

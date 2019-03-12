@@ -35,5 +35,13 @@ public class RedisUtil {
 		jedis.close();
 		return retString;
 	}
+	
+	public static Long getEffectiveTime(String key, int dbIndex) {
+		Jedis jedis = jedisPool.getResource();
+		jedis.select(dbIndex);
+		Long effectiveTimeRemain = jedis.ttl(key);
+		jedis.close();
+		return effectiveTimeRemain;
+	}
 
 }

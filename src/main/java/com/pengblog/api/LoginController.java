@@ -1,6 +1,5 @@
 package com.pengblog.api;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +10,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.google.gson.Gson;
+import com.pengblog.bean.CaptchaResult;
+import com.pengblog.bean.LoginResult;
 import com.pengblog.service.IcaptchaService;
 import com.pengblog.service.IloginService;
 
@@ -38,29 +39,29 @@ public class LoginController {
 		
 		String captchaCode = loginInfo.get("captchaCode");
 		
-		Map<String, Object> checkResultMap = captchaService.checkCaptchaCode(captchaId,captchaCode);
+		CaptchaResult captchaResult = captchaService.checkCaptchaCode(captchaId,captchaCode);
 		
-		Map<String,Object> loginMap = new HashMap<>();
+		LoginResult loginResult = new LoginResult();
 		
-		if((Boolean)checkResultMap.get("pass") == false) {
+		if(captchaResult.getPass() == false) {
 			
-			loginMap.put("loginStatus", 0);
+			loginResult.setLoginStatus("fail");
 			
-			loginMap.put("loginMsg", "绕过验证码的非法登录");
+			loginResult.setMessage("绕过验证码的非法登录");
 			
 			Gson gson = new Gson();
 			
-			String retJson = gson.toJson(loginMap);
+			String retJson = gson.toJson(loginResult);
 			
 			return retJson;
 			
 		}
 		
-		loginMap = loginService.login(username, password);
+		loginResult = loginService.login(username, password);
 		
 		Gson gson = new Gson();
 		
-		String retJson = gson.toJson(loginMap);
+		String retJson = gson.toJson(loginResult);
 		
 		return retJson;
 		
@@ -79,4 +80,33 @@ public class LoginController {
 	}
 	
 	
+	@RequestMapping(value="/login_dynamic.do", produces="application/json;charset=utf-8")
+	@ResponseBody
+	public Object loginDynamic(@RequestBody Map<String,String> loginInfo) {
+		
+		String phoneNumber = loginInfo.get("phoneNumber");
+		
+		String dynamicPassword = loginInfo.get("password");
+		
+		LoginResult loginResult = loginService.loginDynamic(phoneNumber, dynamicPassword);
+		
+		Gson gson = new Gson();
+		
+		String retJson = gson.toJson(loginResult);
+		
+		return retJson;
+		
+		/*Map retMap = new HashMap<>();
+		
+		retMap.put("username", loginInfo.get("username"));
+		
+		retMap.put("password", loginInfo.get("password"));
+		
+		Gson gson = new Gson();
+		
+		String retJson = gson.toJson(retMap);
+		
+		return retJson;*/
+		
+	}
 }

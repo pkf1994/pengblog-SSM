@@ -2,15 +2,14 @@ package com.pengblog.sms;
 
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 import org.json.JSONException;
 
 import com.github.qcloudsms.SmsSingleSender;
 import com.github.qcloudsms.httpclient.HTTPException;
+import com.pengblog.bean.SendSmsResult;
 
 public class SmsSender {
 	// 短信应用SDK AppID
@@ -29,18 +28,18 @@ public class SmsSender {
 	private String[] authenticatedPhoneNumbers;
 	
 	
-	public Map<String,Object> send(String phoneNumber,String code,int expireMinutes) throws JSONException, HTTPException, IOException {
+	public SendSmsResult send(String phoneNumber,String code,int expireMinutes) throws JSONException, HTTPException, IOException {
 		
-		Map<String,Object> retMap = new HashMap<>();
+		SendSmsResult sendSmsResult = new SendSmsResult();
 		
 		Set<String> allowPhoneNumbers = new HashSet<>(Arrays.asList(authenticatedPhoneNumbers));
 		
 		if(!allowPhoneNumbers.contains(phoneNumber)) {
 			
-			retMap.put("status", "fail");
-			retMap.put("message", "Unauthorized Number");
+			sendSmsResult.setSuccess(false);
+			sendSmsResult.setMessage("Unauthorized Number");
 			
-			return retMap;
+			return sendSmsResult;
 		}
 		
 		 String[] params = {code,expireMinutes + ""};
@@ -49,9 +48,10 @@ public class SmsSender {
 		 ssender.sendWithParam("86", phoneNumber,
 			        templateId, params, smsSign, "", "");
 		 
-		 retMap.put("status", "success");
+		 sendSmsResult.setSuccess(true);
+			
+		 return sendSmsResult;
 		 
-		return retMap;
 	}
 
 	public void setAppid(int appid) {

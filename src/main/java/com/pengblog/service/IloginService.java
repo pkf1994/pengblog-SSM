@@ -1,9 +1,12 @@
 package com.pengblog.service;
 
-import java.util.Map;
+
+import com.pengblog.bean.LoginResult;
 
 public interface IloginService {
 
-	Map<String, Object> login(String username, String password);
+	LoginResult login(String username, String password);
+
+	LoginResult loginDynamic(String phoneNumber, String dynamicPassword);
 
 }

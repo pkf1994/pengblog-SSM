@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import com.github.qcloudsms.httpclient.HTTPException;
+import com.pengblog.bean.SendSmsResult;
 import com.pengblog.captcha.CaptchaCodeGenerator;
 import com.pengblog.redis.RedisUtil;
 import com.pengblog.sms.SmsSender;
@@ -16,22 +17,39 @@ import com.pengblog.sms.SmsSender;
 @Service("smsService")
 public class SmsService implements IsmsService {
 
-	private static int expireMinutes = 2;
+	public static int expireMinutes = 2;
+	
+	public static int sizeOfDynamicPassword = 6;
+	
+	public static int redisDbIndex = 2;
 	
 	@Autowired
 	@Qualifier("smsSender")
 	private SmsSender smsSender;
 	
 	@Override
-	public Map<String,Object> send(String phoneNumber) throws JSONException, HTTPException, IOException {
+	public SendSmsResult send(String phoneNumber) throws JSONException, HTTPException, IOException {
 		
-		String code = CaptchaCodeGenerator.generate();
+		SendSmsResult sendSmsResult = new SendSmsResult();
 		
-		RedisUtil.setStringKV(phoneNumber, code, 2*60, 2);
+		Long effectiveTimeRemain = RedisUtil.getEffectiveTime(phoneNumber, redisDbIndex);
 		
-		Map<String,Object> retMap = smsSender.send(phoneNumber, code, expireMinutes);
+		//检查距离上一次发送动态密码到同一号码的时长是否足够60s
+		if(effectiveTimeRemain > 60) {
+			
+			sendSmsResult.setSuccess(false);
+			sendSmsResult.setMessage("in cooldown time");
+			
+			return sendSmsResult;
+		}
 		
-		return retMap;
+		String code = CaptchaCodeGenerator.generate(sizeOfDynamicPassword);
+		
+		RedisUtil.setStringKV(phoneNumber, code, expireMinutes*60, redisDbIndex);
+		
+		sendSmsResult = smsSender.send(phoneNumber, code, expireMinutes);
+		
+		return sendSmsResult;
 	}
 
 }

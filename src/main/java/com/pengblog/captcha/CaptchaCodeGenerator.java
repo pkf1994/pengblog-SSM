@@ -30,6 +30,20 @@ public class CaptchaCodeGenerator {
     	
 		return captchaCode;
 	}
+	
+	public static String generate(int mySize) {
+		
+		String captchaCode = "";
+	    
+	    //绘制字母数字
+    	for (int i = 0; i < mySize; i++){
+	    	
+    		captchaCode += ch[random.nextInt(ch.length)];
+	       
+	    }
+    	
+		return captchaCode;
+	}
 
 	@Autowired
 	public void setSize(int size) {

@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.google.code.kaptcha.impl.DefaultKaptcha;
+import com.pengblog.bean.CaptchaResult;
 import com.pengblog.captcha.CaptchaCodeGenerator;
 import com.pengblog.redis.RedisUtil;
 
@@ -37,27 +38,33 @@ public class CaptchaService implements IcaptchaService {
 	}
 
 	@Override
-	public Map<String, Object> checkCaptchaCode(String captchaId, String uncheckCaptchaCode) {
+	public CaptchaResult checkCaptchaCode(String captchaId, String uncheckCaptchaCode) {
 		
-		Map<String,Object> retMap = new HashMap<>();
+		CaptchaResult captchaResult = new CaptchaResult();
 
 		String correctCaptchaCode = RedisUtil.getStringKV(captchaId, dbIndex);
 		
 		if(correctCaptchaCode == null) {
-			retMap.put("pass", false);
-			retMap.put("status", "overdue");
-			return retMap;
+			
+			captchaResult.setPass(false);
+			captchaResult.setMessage("overdue");
+			
+			return captchaResult;
 		}
 		
 		if(!correctCaptchaCode.equalsIgnoreCase(uncheckCaptchaCode)){
-			retMap.put("pass", false);
-			retMap.put("status", "wrong");
-			return retMap;
+			
+			captchaResult.setPass(false);
+			captchaResult.setMessage("wrong");
+			
+			return captchaResult;
 		}
 		
 		if(correctCaptchaCode.equalsIgnoreCase(uncheckCaptchaCode)) {
-			retMap.put("pass", true);
-			return retMap;
+			
+			captchaResult.setPass(true);
+			
+			return captchaResult;
 		}
 		
 		return null;
