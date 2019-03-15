@@ -124,6 +124,10 @@ public class CommentService implements IcommentService{
 			visitor.setVisitor_siteAddress(commentData.get("visitor_siteAddress"));
 		}
 		
+		if(commentData.containsKey("comment_platform") && (commentData.get("comment_platform")!="")) {
+			comment.setComment_platform(commentData.get("comment_platform"));
+		}
+		
 		comment.setComment_hostArticle(article);
 		
 		comment.setComment_author(visitor);

@@ -115,7 +115,20 @@ public class LoginService implements IloginService{
 		//从redis中获取正确的动态密码
 		String correctDynamicPassword = RedisUtil.getStringKV(phoneNumber, SmsService.redisDbIndex);
 		// TODO Auto-generated method stub
-		if(correctDynamicPassword != dynamicPassword) {
+		if(correctDynamicPassword == null) {
+			loginResult.setLoginStatus("fail");
+			
+			loginResult.setMessage("overdue dynamic password");
+			
+			
+			logger.info(LogUtil.infoBegin);
+			logger.info("登录失败，动态密码已过期");
+			logger.info(LogUtil.infoEnd);
+			
+			return loginResult;
+		}
+		
+		if(!correctDynamicPassword.equals(dynamicPassword)) {
 			
 			loginResult.setLoginStatus("fail");
 			

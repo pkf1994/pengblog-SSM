@@ -9,6 +9,7 @@
 		<result column="comment_content" property="comment_content"/>
 		<result column="comment_releaseTime" property="comment_releaseTime"/>
 		<result column="comment_haveSubComment" property="comment_haveSubComment"/>
+		<result column="comment_platform" property="comment_platform"/>
 		<association property="comment_referComment"
 					javaType="com.pengblog.bean.Comment"
 					select="selectCommentById"
@@ -131,11 +132,13 @@
 					comment_referComment, 
 					comment_content, 
 					comment_releaseTime, 
+					comment_platform,
 					comment_hostId)
 		VALUES(#{comment_author.visitor_id}, 
 				#{comment_referComment.comment_id}, 
 				#{comment_content}, 
 				#{comment_releaseTime},
+				#{comment_platform},
 				#{comment_hostArticle.article_id})
 		<selectKey resultType="int" keyProperty="comment_id" order="AFTER">
 			select @@identity
@@ -190,6 +193,7 @@
 			comment_content = #{comment_content},
 			comment_releaseTime = #{comment_releaseTime},
 			comment_hostId = #{comment_hostArticle.article_id},
+			comment_platform = #{comment_platform},
 			comment_haveSubComment = #{comment_haveSubComment}
 		WHERE
 			comment_id = #{comment_id}

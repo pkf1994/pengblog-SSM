@@ -18,6 +18,8 @@ public class Comment implements Serializable{
 	private Article comment_hostArticle;
 	
 	private Boolean comment_haveSubComment;
+	
+	private String comment_platform;
 
 	/**
 	 * @return the comment_id
@@ -92,9 +94,23 @@ public class Comment implements Serializable{
 	public void setComment_haveSubComment(Boolean comment_haveSubComment) {
 		this.comment_haveSubComment = comment_haveSubComment;
 	}
+	
+	
+
+	public String getComment_platform() {
+		return comment_platform;
+	}
+
+	public void setComment_platform(String comment_platform) {
+		this.comment_platform = comment_platform;
+	}
+
+	
+
 
 	public Comment(Integer comment_id, Visitor comment_author, Comment comment_referComment, String comment_content,
-			Date comment_releaseTime, Article comment_hostArticle, Boolean comment_haveSubComment) {
+			Date comment_releaseTime, Article comment_hostArticle, Boolean comment_haveSubComment,
+			String comment_platform) {
 		super();
 		this.comment_id = comment_id;
 		this.comment_author = comment_author;
@@ -103,8 +119,8 @@ public class Comment implements Serializable{
 		this.comment_releaseTime = comment_releaseTime;
 		this.comment_hostArticle = comment_hostArticle;
 		this.comment_haveSubComment = comment_haveSubComment;
+		this.comment_platform = comment_platform;
 	}
-
 
 	/**
 	 * 

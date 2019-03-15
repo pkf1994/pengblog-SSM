@@ -29,7 +29,7 @@ public class MyTokenUtil {
         Map<String, Object> claims = new HashMap<String, Object>();
         
         //claims.put("administrator_id", administrator.getAdministrator_id());
-        claims.put("administrator_username", administrator.getAdministrator_username());
+        claims.put("username", administrator.getAdministrator_username());
         // claims.put("administrator_password", administrator.getAdministrator_password());
         
         //生成签名的时候使用的秘钥secret
