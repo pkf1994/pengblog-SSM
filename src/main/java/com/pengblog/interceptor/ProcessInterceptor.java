@@ -44,7 +44,7 @@ public class ProcessInterceptor implements HandlerInterceptor {
 				  httpServletResponse.setStatus(200);
 				  return false;
 		    	}
-		System.out.println(method);
+		//System.out.println(method);
 		return true;
 	  }
 	 

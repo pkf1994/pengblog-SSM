@@ -28,6 +28,15 @@ public class RedisUtil {
 		jedis.close();
 	}
 	
+	public static void setStringKV(String key, String value, Long expireLong, int dbIndex) {
+		Jedis jedis = jedisPool.getResource();
+		jedis.select(dbIndex);
+		jedis.set(key, value);
+		int expireInt = expireLong.intValue();
+		jedis.expire(key, expireInt);
+		jedis.close();
+	}
+	
 	public static String getStringKV(String key, int dbIndex) {
 		Jedis jedis = jedisPool.getResource();
 		jedis.select(dbIndex);

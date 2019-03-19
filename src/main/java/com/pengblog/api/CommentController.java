@@ -9,6 +9,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
@@ -17,9 +19,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.google.gson.Gson;
+import com.peng.annotation.RecordClientIP;
 import com.peng.annotation.RequireToken;
 import com.pengblog.bean.Comment;
+import com.pengblog.bean.SubmitCommentResult;
 import com.pengblog.bean.Visitor;
+import com.pengblog.interceptor.RecordClientIPInterceptor;
+import com.pengblog.redis.RedisUtil;
 import com.pengblog.service.IcommentService;
 import com.pengblog.service.IvisitorService;
 
@@ -119,9 +125,10 @@ public class CommentController {
 		return retJson;
 	}
 	
+	@RecordClientIP
 	@RequestMapping(value="/submit_comment.do", produces="application/json;charset=UTF-8")
 	@ResponseBody
-	public Object submitComment(@RequestBody Map<String, String> commentData) throws UnsupportedEncodingException {
+	public Object submitComment(@RequestBody Map<String, String> commentData, HttpServletRequest request) throws UnsupportedEncodingException {
 		
 		Comment comment = commentService.constructComment(commentData);
 		
@@ -133,15 +140,15 @@ public class CommentController {
 		
 		commentService.saveComment(comment);
 		
-		Map<String, Object> retMap = new HashMap<>();
+		SubmitCommentResult submitCommentResult = new SubmitCommentResult();
 		
-		retMap.put("commentIdJustSubmit", comment.getComment_id());
+		submitCommentResult.setSuccess(true);
 		
-		retMap.put("submitSuccessful", true);
+		submitCommentResult.setCommentIdJustSubmit(comment.getComment_id());
 		
 		Gson gson = new Gson();
 		
-		String retJson = gson.toJson(retMap);
+		String retJson = gson.toJson(submitCommentResult);
 	
 		return retJson;
 		
@@ -194,6 +201,37 @@ public class CommentController {
 		
 		return "delete comment successful";
 	}
+	
+	@RequestMapping(value="/check_whether_need_captcha.do", produces="application/json;charset=UTF-8")
+	@ResponseBody
+	public Object checkWhetherNeedCaptcha(HttpServletRequest request) {
+		
+		String clientIP = request.getHeader("X-Real-IP");
+		
+		//没有传来ip，需要输入验证码
+		if(clientIP == null) {
+			return true;
+		}
+		
+		//从redis取出该ip最近提交评论次数
+		String timesStr = RedisUtil.getStringKV(clientIP, RecordClientIPInterceptor.dbIndex);
+		
+		//redis中没有发现该ip
+		if(timesStr == null) {
+			return false;
+		}
+		
+		int times = Integer.parseInt(timesStr);
+		
+		//该ip最近提交评论次数小于5，则不需要输入验证码
+		if(times < 5) {
+			return false;
+		}
+		
+		//该ip最近提交评论次数大于等于5，需要输入验证码
+		return true;
+	}
+	
 }
 
 
