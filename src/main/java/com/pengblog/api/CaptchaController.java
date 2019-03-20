@@ -37,14 +37,14 @@ public class CaptchaController {
 	
 	@RequestMapping(value="/check_captcha.do",produces="application/json;charset=UTF-8")
 	@ResponseBody
-	public Object checkCaptcha(String captchaId, String uncheckCaptchaCode) throws IOException {
+	public Object checkCaptcha(String captchaId, String uncheckCaptchaCode) throws Exception {
 		
 		CaptchaResult captchaResult = captchaService.checkCaptchaCode(captchaId,uncheckCaptchaCode);
 		
-		Gson gson = new Gson();		
+		if(!captchaResult.getPass()) {
+			ReturnVo.err(captchaResult.getMessage());
+		}
 		
-		String retJson = gson.toJson(captchaResult);
-		
-		return retJson;
+		return ReturnVo.ok(captchaResult);
 	}
 }

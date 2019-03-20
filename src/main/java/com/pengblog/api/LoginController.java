@@ -29,7 +29,7 @@ public class LoginController {
 	
 	@RequestMapping(value="/login.do", produces="application/json;charset=utf-8")
 	@ResponseBody
-	public Object login(@RequestBody Map<String,String> loginInfo) {
+	public Object login(@RequestBody Map<String,String> loginInfo) throws Exception {
 		
 		String username = loginInfo.get("username");
 		
@@ -45,44 +45,25 @@ public class LoginController {
 		
 		if(captchaResult.getPass() == false) {
 			
-			loginResult.setLoginStatus("fail");
-			
-			loginResult.setMessage("绕过验证码的非法登录");
-			
-			Gson gson = new Gson();
-			
-			String retJson = gson.toJson(loginResult);
-			
-			return retJson;
+			ReturnVo.err("绕过验证码的非法登录");
 			
 		}
 		
 		loginResult = loginService.login(username, password);
 		
-		Gson gson = new Gson();
+		if(!loginResult.getSuccess()) {
+			ReturnVo.err(loginResult.getMessage());
+		}
+
+		return ReturnVo.ok(loginResult);
 		
-		String retJson = gson.toJson(loginResult);
-		
-		return retJson;
-		
-		/*Map retMap = new HashMap<>();
-		
-		retMap.put("username", loginInfo.get("username"));
-		
-		retMap.put("password", loginInfo.get("password"));
-		
-		Gson gson = new Gson();
-		
-		String retJson = gson.toJson(retMap);
-		
-		return retJson;*/
 		
 	}
 	
 	
 	@RequestMapping(value="/login_dynamic.do", produces="application/json;charset=utf-8")
 	@ResponseBody
-	public Object loginDynamic(@RequestBody Map<String,String> loginInfo) {
+	public Object loginDynamic(@RequestBody Map<String,String> loginInfo) throws Exception {
 		
 		String phoneNumber = loginInfo.get("phoneNumber");
 		
@@ -90,23 +71,12 @@ public class LoginController {
 		
 		LoginResult loginResult = loginService.loginDynamic(phoneNumber, dynamicPassword);
 		
-		Gson gson = new Gson();
+		if(!loginResult.getSuccess()) {
+			ReturnVo.err(loginResult.getMessage());
+		}
+
+		return ReturnVo.ok(loginResult);
 		
-		String retJson = gson.toJson(loginResult);
-		
-		return retJson;
-		
-		/*Map retMap = new HashMap<>();
-		
-		retMap.put("username", loginInfo.get("username"));
-		
-		retMap.put("password", loginInfo.get("password"));
-		
-		Gson gson = new Gson();
-		
-		String retJson = gson.toJson(retMap);
-		
-		return retJson;*/
 		
 	}
 }

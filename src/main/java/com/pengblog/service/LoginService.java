@@ -3,6 +3,7 @@ package com.pengblog.service;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -12,7 +13,9 @@ import org.springframework.stereotype.Service;
 
 import com.pengblog.bean.Administrator;
 import com.pengblog.bean.LoginResult;
+import com.pengblog.constant.PengblogConstant;
 import com.pengblog.dao.IadministratorDao;
+import com.pengblog.jwt.JwtUtil;
 import com.pengblog.redis.RedisUtil;
 import com.pengblog.sms.SmsSender;
 import com.pengblog.utils.LogUtil;
@@ -31,8 +34,6 @@ public class LoginService implements IloginService{
 	@Qualifier("smsSender")
 	private SmsSender smsSender;
 	
-	public static int validTimeMillis = 24*3600*1000;
-
 	@Override
 	public LoginResult login(String username, String password) {
 
@@ -42,7 +43,7 @@ public class LoginService implements IloginService{
 		
 		if(administrator == null) {
 			
-			loginResult.setLoginStatus("fail");
+			loginResult.setSuccess(false);
 			
 			loginResult.setMessage("non-existent users");
 			
@@ -63,7 +64,7 @@ public class LoginService implements IloginService{
 		
 		if(!rightAdministrator) {
 			
-			loginResult.setLoginStatus("fail");
+			loginResult.setSuccess(false);
 			
 			loginResult.setMessage("wrong password");
 			
@@ -73,15 +74,15 @@ public class LoginService implements IloginService{
 			
 		}else{	
 			
-			loginResult.setLoginStatus("success");
+			loginResult.setSuccess(true);
 			
 			loginResult.setMessage("sign in success");
 			
-			String token = MyTokenUtil.createJWT(validTimeMillis, administrator);
+			String token = JwtUtil.createJWT(UUID.randomUUID().toString(), administrator.getAdministrator_username(), PengblogConstant.JWT_EXPIRE_TIME_LONG);
 			
 			loginResult.setToken(token);
 			
-			loginResult.setValidTimeMillis(validTimeMillis);
+			loginResult.setValidTimeMillis(PengblogConstant.JWT_EXPIRE_TIME_LONG);
 			
 			logger.info(LogUtil.infoBegin);
 			logger.info("管理员" + administrator.getAdministrator_username() + "登录成功，登录时长6000000ms");
@@ -99,7 +100,7 @@ public class LoginService implements IloginService{
 		//检查用户输入的号码是否被认证
 		if(!Arrays.asList(smsSender.getAuthenticatedPhoneNumbers()).contains(phoneNumber)) {
 			
-			loginResult.setLoginStatus("fail");
+			loginResult.setSuccess(false);
 			
 			loginResult.setMessage("unauthorized phone number");
 			
@@ -116,7 +117,7 @@ public class LoginService implements IloginService{
 		String correctDynamicPassword = RedisUtil.getStringKV(phoneNumber, SmsService.redisDbIndex);
 		// TODO Auto-generated method stub
 		if(correctDynamicPassword == null) {
-			loginResult.setLoginStatus("fail");
+			loginResult.setSuccess(false);
 			
 			loginResult.setMessage("overdue dynamic password");
 			
@@ -130,7 +131,7 @@ public class LoginService implements IloginService{
 		
 		if(!correctDynamicPassword.equals(dynamicPassword)) {
 			
-			loginResult.setLoginStatus("fail");
+			loginResult.setSuccess(false);
 			
 			loginResult.setMessage("wrong dynamic password");
 			
@@ -142,15 +143,15 @@ public class LoginService implements IloginService{
 			return loginResult;
 		}
 		
-		loginResult.setLoginStatus("success");
+		loginResult.setSuccess(true);
 		
 		loginResult.setMessage("sign in success");
 		
-		String token = MyTokenUtil.createJWT(validTimeMillis, phoneNumber);
+		String token = JwtUtil.createJWT(UUID.randomUUID().toString(), phoneNumber, PengblogConstant.JWT_EXPIRE_TIME_LONG);
 		
 		loginResult.setToken(token);
 		
-		loginResult.setValidTimeMillis(validTimeMillis);
+		loginResult.setValidTimeMillis(PengblogConstant.JWT_EXPIRE_TIME_LONG);
 		
 		logger.info(LogUtil.infoBegin);
 		logger.info("登录失败，输入了错误的动态密码");

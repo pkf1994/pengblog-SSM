@@ -18,6 +18,8 @@ import com.auth0.jwt.interfaces.DecodedJWT;
 import com.peng.annotation.RequireToken;
 import com.peng.exception.AuthenticationException;
 import com.pengblog.bean.Administrator;
+import com.pengblog.jwt.JwtTokenCheckResult;
+import com.pengblog.jwt.JwtUtil;
 import com.pengblog.service.IadministratorService;
 import com.pengblog.utils.LogUtil;
 import com.pengblog.utils.MyTokenUtil;
@@ -54,43 +56,29 @@ public class AuthenticationInterceptor implements HandlerInterceptor{
 	                     throw new AuthenticationException("此操作需要管理员权限，请登录");
 	                 }
 	            	 
-	            	 //检查token是否合法
-	            	 int administrator_id;
-	            	 
-	            	 try {
-	            		 
-						administrator_id = JWT.decode(token).getClaim("administrator_id").asInt();
+	            	 JwtTokenCheckResult jwtTokenCheckResult = JwtUtil.validateJWT(token);
 						
-					} catch (Exception e) {
-						logger.info(LogUtil.infoBegin);
-						logger.info("token解析异常");
-						logger.info(LogUtil.infoEnd);
-						throw new AuthenticationException("鉴权错误: token解析异常");
-						
-					}
-					Administrator administrator = administratorService.getAdministratorById(administrator_id);
-	            	 
-	            	 if(administrator == null) {
+	            	 if(!jwtTokenCheckResult.getSuccess()) {
 	            		 
 	            		 logger.info(LogUtil.infoBegin);
-	            		 logger.info("非法用户");
+	            		 logger.info("鉴权错误: " + jwtTokenCheckResult.getErrCode());
 	            		 logger.info(LogUtil.infoEnd);
 	            		 
+	            		 switch (jwtTokenCheckResult.getErrCode()) {
+	            		 
+							case 1:
+								throw new AuthenticationException("JWT_ERRCODE_EXPIRE");
+
+							case 2:
+								throw new AuthenticationException("JWT_ERRCODE_FAIL");
+								
+							default:
+								break;
+						}
 	            		 throw new AuthenticationException("非法用户！");
 	            		
 	            	 }
-	            	 
-	            	 Boolean verify =MyTokenUtil.isVerify(token, administrator);
-	            	 
-	                 if (!verify) {
-	                	 
-	                	 logger.info(LogUtil.infoBegin);
-	                	 logger.info("非法访问");
-	                	 logger.info(LogUtil.infoEnd);
-	                	 
-	                     throw new AuthenticationException("非法访问！");
-	                     
-	                 }
+	          
 	                 
 	                 logger.info(LogUtil.infoBegin);
 	                 logger.info("鉴权通过");

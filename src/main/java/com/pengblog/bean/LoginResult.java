@@ -2,19 +2,19 @@ package com.pengblog.bean;
 
 public class LoginResult {
 	
-	private String loginStatus;
+	private Boolean success;
 	
 	private String message;
 	
 	private String token;
 	
-	private int validTimeMillis; 
+	private long validTimeMillis; 
 	
-	public int getValidTimeMillis() {
+	public long getValidTimeMillis() {
 		return validTimeMillis;
 	}
 
-	public void setValidTimeMillis(int validTimeMillis) {
+	public void setValidTimeMillis(long validTimeMillis) {
 		this.validTimeMillis = validTimeMillis;
 	}
 
@@ -26,12 +26,12 @@ public class LoginResult {
 		this.token = token;
 	}
 
-	public String getLoginStatus() {
-		return loginStatus;
+	public Boolean getSuccess() {
+		return success;
 	}
 
-	public void setLoginStatus(String loginStatus) {
-		this.loginStatus = loginStatus;
+	public void setSuccess(Boolean success) {
+		this.success = success;
 	}
 
 	public String getMessage() {

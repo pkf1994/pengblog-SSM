@@ -28,7 +28,7 @@ public class MyTokenUtil {
         //创建payload
         Map<String, Object> claims = new HashMap<String, Object>();
         
-        //claims.put("administrator_id", administrator.getAdministrator_id());
+        claims.put("administrator_id", administrator.getAdministrator_id());
         claims.put("username", administrator.getAdministrator_username());
         // claims.put("administrator_password", administrator.getAdministrator_password());
         

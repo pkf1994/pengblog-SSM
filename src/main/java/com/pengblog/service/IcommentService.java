@@ -54,4 +54,6 @@ public interface IcommentService {
 	
 	int getCountOfAllComment();
 
+	Boolean checkWhetherNeedCaptcha(String clientIP);
+
 }

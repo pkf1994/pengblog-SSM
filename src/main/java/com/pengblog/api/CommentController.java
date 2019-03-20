@@ -21,11 +21,14 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.google.gson.Gson;
 import com.peng.annotation.RecordClientIP;
 import com.peng.annotation.RequireToken;
+import com.pengblog.bean.CaptchaResult;
 import com.pengblog.bean.Comment;
 import com.pengblog.bean.SubmitCommentResult;
 import com.pengblog.bean.Visitor;
 import com.pengblog.interceptor.RecordClientIPInterceptor;
 import com.pengblog.redis.RedisUtil;
+import com.pengblog.service.CommentService;
+import com.pengblog.service.IcaptchaService;
 import com.pengblog.service.IcommentService;
 import com.pengblog.service.IvisitorService;
 
@@ -44,6 +47,11 @@ public class CommentController {
 	@Autowired
 	@Qualifier("visitorService")
 	private IvisitorService visitorService;
+	
+	@Autowired
+	@Qualifier("captchaService")
+	private IcaptchaService captchaService;
+	
 
 	@RequestMapping(value="/comment_list.do", produces="application/json;charset=UTF-8")
 	@ResponseBody
@@ -130,6 +138,35 @@ public class CommentController {
 	@ResponseBody
 	public Object submitComment(@RequestBody Map<String, String> commentData, HttpServletRequest request) throws UnsupportedEncodingException {
 		
+		String clientIP = request.getHeader("X-Real-IP");
+		
+		Boolean needCaptcha = commentService.checkWhetherNeedCaptcha(clientIP);
+		
+		SubmitCommentResult submitCommentResult = new SubmitCommentResult();
+		
+		if(needCaptcha) {
+			
+			String captchaId = commentData.get("captchaId");
+			
+			String captchaCode = commentData.get("captchaCode");
+			
+			CaptchaResult captchaResult = captchaService.checkCaptchaCode(captchaId,captchaCode);
+			
+			if(captchaResult.getPass() == false) {
+				
+				submitCommentResult.setSuccess(false);
+				
+				submitCommentResult.setMessage("绕过验证码的非法提交");
+				
+				Gson gson = new Gson();
+				
+				String retJson = gson.toJson(submitCommentResult);
+				
+				return retJson;
+				
+			}
+		}
+		
 		Comment comment = commentService.constructComment(commentData);
 		
 		Visitor visitor = comment.getComment_author();
@@ -140,7 +177,6 @@ public class CommentController {
 		
 		commentService.saveComment(comment);
 		
-		SubmitCommentResult submitCommentResult = new SubmitCommentResult();
 		
 		submitCommentResult.setSuccess(true);
 		
@@ -208,28 +244,9 @@ public class CommentController {
 		
 		String clientIP = request.getHeader("X-Real-IP");
 		
-		//没有传来ip，需要输入验证码
-		if(clientIP == null) {
-			return true;
-		}
+		Boolean needCaptcha = commentService.checkWhetherNeedCaptcha(clientIP);
 		
-		//从redis取出该ip最近提交评论次数
-		String timesStr = RedisUtil.getStringKV(clientIP, RecordClientIPInterceptor.dbIndex);
-		
-		//redis中没有发现该ip
-		if(timesStr == null) {
-			return false;
-		}
-		
-		int times = Integer.parseInt(timesStr);
-		
-		//该ip最近提交评论次数小于5，则不需要输入验证码
-		if(times < 5) {
-			return false;
-		}
-		
-		//该ip最近提交评论次数大于等于5，需要输入验证码
-		return true;
+		return needCaptcha;
 	}
 	
 }

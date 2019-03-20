@@ -16,6 +16,8 @@ import com.pengblog.bean.Article;
 import com.pengblog.bean.Comment;
 import com.pengblog.bean.Visitor;
 import com.pengblog.dao.IcommentDao;
+import com.pengblog.interceptor.RecordClientIPInterceptor;
+import com.pengblog.redis.RedisUtil;
 import com.pengblog.utils.LogUtil;
 
 /**
@@ -238,6 +240,33 @@ public class CommentService implements IcommentService{
 		int countOfComment = commentDao.selectCountOfComment();
 		
 		return countOfComment;
+	}
+
+	@Override
+	public Boolean checkWhetherNeedCaptcha(String clientIP) {
+		
+		//没有传来ip，需要输入验证码
+		if(clientIP == null) {
+			return true;
+		}
+		
+		//从redis取出该ip最近提交评论次数
+		String timesStr = RedisUtil.getStringKV(clientIP, RecordClientIPInterceptor.dbIndex);
+		
+		//redis中没有发现该ip
+		if(timesStr == null) {
+			return false;
+		}
+		
+		int times = Integer.parseInt(timesStr);
+		
+		//该ip最近提交评论次数小于5，则不需要输入验证码
+		if(times < 5) {
+			return false;
+		}
+		
+		//该ip最近提交评论次数大于等于5，需要输入验证码
+		return true;
 	}
 
 
