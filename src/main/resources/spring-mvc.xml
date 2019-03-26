@@ -26,6 +26,7 @@
 		    <bean class="com.pengblog.interceptor.ProcessInterceptor"/>
 		    <bean class="com.pengblog.interceptor.AuthenticationInterceptor"/> 
 		    <bean class="com.pengblog.interceptor.RecordClientIPInterceptor"/> 
+		    <bean class="com.pengblog.interceptor.MarkFrontEndCacheableInterceptor"/> 
 	  	</mvc:interceptors>
 	  	
 	 

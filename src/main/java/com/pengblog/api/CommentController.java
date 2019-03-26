@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.google.gson.Gson;
+import com.peng.annotation.FrontEndCacheable;
 import com.peng.annotation.RecordClientIP;
 import com.peng.annotation.RequireToken;
 import com.pengblog.bean.CaptchaResult;
@@ -53,6 +54,7 @@ public class CommentController {
 	private IcaptchaService captchaService;
 	
 
+	@FrontEndCacheable
 	@RequestMapping(value="/comment_list.do", produces="application/json;charset=UTF-8")
 	@ResponseBody
 	public Object getCommentList(int article_id, int startIndex, int pageScale) {
@@ -75,7 +77,7 @@ public class CommentController {
 		return retJson;
 	}
 	
-
+	@FrontEndCacheable
 	@RequestMapping(value="/top_level_comment_list.do", produces="application/json;charset=UTF-8")
 	@ResponseBody
 	public Object getTopLevelCommentList(int article_id, int startIndex, int pageScale) {
@@ -98,6 +100,7 @@ public class CommentController {
 		return retJson;
 	}
 	
+	@FrontEndCacheable
 	@RequestMapping(value="/sub_comment_list.do", produces="application/json;charset=UTF-8")
 	@ResponseBody
 	public Object getSubCommentList(int comment_id, int startIndex, int pageScale) {
@@ -120,6 +123,7 @@ public class CommentController {
 		return retJson;
 	}
 	
+	@FrontEndCacheable
 	@RequestMapping(value="/comment.do", produces="application/json;charset=UTF-8")
 	@ResponseBody
 	public Object getComment(int comment_id) {
@@ -190,6 +194,7 @@ public class CommentController {
 		
 	}
 	
+	@FrontEndCacheable
 	@RequestMapping(value="/comment_last.do", produces="application/json;charset=UTF-8")
 	@ResponseBody
 	public Object getCommentLast(int startIndex, int pageScale) {
@@ -219,6 +224,7 @@ public class CommentController {
 		return retJson;
 	}
 	
+	@FrontEndCacheable
 	@RequestMapping(value="/comment_count.do", produces="application/json;charset=UTF-8")
 	@ResponseBody
 	public Object getCommentCount(int article_id) {

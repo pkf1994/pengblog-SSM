@@ -13,9 +13,6 @@
      http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd">
      
   	
-  	<bean class="com.pengblog.captcha.CaptchaCodeGenerator">
-	    <property name="size" value="${kaptcha.size}"/>
-  	</bean>
   	
   	<bean id="kaptchaConfig" class="com.google.code.kaptcha.util.Config">
 	  	<constructor-arg>

@@ -2,13 +2,10 @@ package com.pengblog.captcha;
 
 import java.util.Random;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
-@Component
 public class CaptchaCodeGenerator {
 	
-	private static int size;
+	private static int size = 4;
 	
 	private static Random random = new Random();
 
@@ -45,9 +42,5 @@ public class CaptchaCodeGenerator {
 		return captchaCode;
 	}
 
-	@Autowired
-	public void setSize(int size) {
-		CaptchaCodeGenerator.size = size;
-	}
 
 }

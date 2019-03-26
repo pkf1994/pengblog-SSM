@@ -8,18 +8,36 @@ import javax.servlet.http.HttpServletResponse;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
+
+import com.auth0.jwt.JWT;
+import com.peng.annotation.FrontEndCacheable;
 import com.peng.annotation.RecordClientIP;
+import com.peng.annotation.RequireToken;
+import com.peng.exception.AuthenticationException;
+import com.pengblog.bean.Administrator;
 import com.pengblog.constant.PengblogConstant;
 import com.pengblog.redis.RedisUtil;
+import com.pengblog.utils.LogUtil;
+import com.pengblog.utils.MyTokenUtil;
 
-public class RecordClientIPInterceptor implements HandlerInterceptor {
+public class MarkFrontEndCacheableInterceptor implements HandlerInterceptor {
 
-	
-	public static int dbIndex = 3;
+	public static String X_IS_CACHEABLE = "X-Is-Cacheable";
 	
 	@Override
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
 			throws Exception {
+		 
+		HandlerMethod handlerMethod = (HandlerMethod) handler;
+		
+		Method method = handlerMethod.getMethod();
+		
+		//检查是否有FrontEndCacheable注解
+		if (method.isAnnotationPresent(FrontEndCacheable.class)) {
+			
+			response.setHeader(X_IS_CACHEABLE, "true");
+			
+		}
 				return true;
 	}
 
@@ -34,34 +52,6 @@ public class RecordClientIPInterceptor implements HandlerInterceptor {
 	public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex)
 			throws Exception {
 	
-		 
-		HandlerMethod handlerMethod = (HandlerMethod) handler;
 		
-		Method method = handlerMethod.getMethod();
-		
-		//检查是否有RecordClientIP注释，无则跳过认证
-		if (method.isAnnotationPresent(RecordClientIP.class)) {
-			
-			String ip = request.getHeader("X-Real-IP");
-			
-			if(ip != null) {
-				
-				String timesStr = RedisUtil.getStringKV(ip, dbIndex);
-				
-				if(timesStr == null) {
-					RedisUtil.setStringKV(ip, 1+"", PengblogConstant.REDIS_RECORD_IP_TIME_SECOND, dbIndex);
-				}else{
-					int times = Integer.parseInt(timesStr);
-					
-					Long effectTime = RedisUtil.getEffectiveTime(ip, dbIndex);
-					
-					if(effectTime == -1) {
-						effectTime = PengblogConstant.REDIS_RECORD_IP_TIME_SECOND;
-					}
-					
-					RedisUtil.setStringKV(ip, times + 1 + "", effectTime, dbIndex);
-				}
-			}
-		}
 	}
 }

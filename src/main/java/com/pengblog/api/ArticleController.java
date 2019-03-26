@@ -1,7 +1,5 @@
 package com.pengblog.api;
 
-import java.util.Calendar;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -14,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.google.gson.Gson;
+import com.peng.annotation.FrontEndCacheable;
 import com.peng.annotation.RequireToken;
 import com.pengblog.bean.Article;
 import com.pengblog.service.IarticleService;
@@ -32,6 +31,7 @@ public class ArticleController {
 	@Qualifier("articleService")
 	private IarticleService articleService;
 	
+	@FrontEndCacheable
 	@RequestMapping(value="/article_summary.do",produces="application/json;charset=UTF-8")
 	@ResponseBody
 	public Object getArticleSummaryList(int startIndex,
@@ -67,17 +67,18 @@ public class ArticleController {
 		return retJson;
 	}
 	
+	@FrontEndCacheable
 	@RequestMapping(value="/article.do",produces="application/json;charset=UTF-8")
 	@ResponseBody
-	public Object getArticle(int article_id) {
+	public Object getArticle(int article_id) throws Exception {
 		
 		Article article = articleService.getArticleById(article_id);
 		
-		Gson gson = new Gson();
+		if(article == null) {
+			return ReturnVo.err("non-existent");
+		}
 		
-		String retJson = gson.toJson(article);
-		
-		return retJson;
+		return ReturnVo.ok(article);
 	}
 	
 	
@@ -152,6 +153,7 @@ public class ArticleController {
 		return "delete success";
 	}
 	
+	@FrontEndCacheable
 	@RequestMapping(value="/article_filing.do",produces="application/json;charset=UTF-8")
 	@ResponseBody
 	public Object getArticleFiling() {
@@ -165,6 +167,7 @@ public class ArticleController {
 		return retJson;
 	}
 	
+	@FrontEndCacheable
 	@RequestMapping(value="/article_label.do",produces="application/json;charset=UTF-8")
 	@ResponseBody
 	public Object getArticleLabelList() {
