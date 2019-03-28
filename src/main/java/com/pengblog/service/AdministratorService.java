@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 
 import com.pengblog.bean.Administrator;
 import com.pengblog.dao.IadministratorDao;
+import com.pengblog.serviceInterface.IadministratorService;
 
 @Service("administratorService")
 public class AdministratorService implements IadministratorService{

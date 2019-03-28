@@ -10,6 +10,10 @@
 		<result column="comment_releaseTime" property="comment_releaseTime"/>
 		<result column="comment_haveSubComment" property="comment_haveSubComment"/>
 		<result column="comment_platform" property="comment_platform"/>
+		<association column="comment_ip" 
+					javaType="com.pengblog.bean.IpObject" 
+					select="selectIpById" 
+					property="comment_ip"/>
 		<association property="comment_referComment"
 					javaType="com.pengblog.bean.Comment"
 					select="selectCommentById"
@@ -24,7 +28,32 @@
 					column="comment_hostId"/>
 	</resultMap>
 	
+	<resultMap type="Comment" id="commentMapperWithoutIP">
+		<id column="comment_id" property="comment_id"/>
+		<result column="comment_content" property="comment_content"/>
+		<result column="comment_releaseTime" property="comment_releaseTime"/>
+		<result column="comment_haveSubComment" property="comment_haveSubComment"/>
+		<result column="comment_platform" property="comment_platform"/>
+		<association property="comment_referComment"
+					javaType="com.pengblog.bean.Comment"
+					select="selectCommentById"
+					column="comment_refercomment"/>
+		<association property="comment_author"
+					javaType="com.pengblog.bean.Visitor"
+					select="selectVisitorById"
+					column="comment_author"/>
+		<association property="comment_hostArticle"
+					javaType="com.pengblog.bean.Article"
+					select="selectArticleById"
+					column="comment_hostId"/>
+	</resultMap>
 	
+	<select id="selectIpById" resultType="com.pengblog.bean.IpObject">
+		SELECT * FROM
+			ip
+		WHERE 
+			ip_id = #{comment_ip}
+	</select>
 	
 	<select id="selectVisitorById" resultType="Visitor">
 		SELECT * FROM
@@ -75,7 +104,7 @@
 			isdeleted = 0
 	</select>
 	
-	<select id="selectCommentListByLimitIndex" resultMap="commentMapper">
+	<select id="selectCommentListByLimitIndex" resultMap="commentMapperWithoutIP">
 		SELECT * FROM
 			comment
 		WHERE
@@ -89,7 +118,21 @@
 			#{startIndex}, #{pageScale}
 	</select>
 	
-	<select id="selectTopLevelCommentListByLimitIndex" resultMap="commentMapper">
+	<select id="selectCommentListWithIPByLimitIndex" resultMap="commentMapper">
+		SELECT * FROM
+			comment
+		WHERE
+			comment_hostid = #{hostId}
+		AND
+			isdeleted = 0
+		ORDER BY 
+			comment_releaseTime
+		DESC	
+		LIMIT
+			#{startIndex}, #{pageScale}
+	</select>
+	
+	<select id="selectTopLevelCommentListByLimitIndex" resultMap="commentMapperWithoutIP">
 		SELECT * FROM
 			comment
 		WHERE
@@ -105,7 +148,37 @@
 			#{startIndex}, #{pageScale}
 	</select>
 	
-	<select id="selectSubCommentListByLimitIndex" resultMap="commentMapper">
+	<select id="selectTopLevelCommentLisWithIPtByLimitIndex" resultMap="commentMapper">
+		SELECT * FROM
+			comment
+		WHERE
+			comment_hostid = #{hostId}
+		AND
+			comment_referComment IS NULL
+		AND
+			isdeleted = 0
+		ORDER BY 
+			comment_releaseTime
+		ASC	
+		LIMIT
+			#{startIndex}, #{pageScale}
+	</select>
+	
+	<select id="selectSubCommentListByLimitIndex" resultMap="commentMapperWithoutIP">
+		SELECT * FROM
+			comment
+		WHERE
+			comment_referComment = #{comment_id}
+		AND
+			isdeleted = 0
+		ORDER BY 
+			comment_releaseTime
+		ASC	
+		LIMIT
+			#{startIndex}, #{pageScale}
+	</select>
+	
+	<select id="selectSubCommentListWithIPByLimitIndex" resultMap="commentMapper">
 		SELECT * FROM
 			comment
 		WHERE
@@ -133,12 +206,14 @@
 					comment_content, 
 					comment_releaseTime, 
 					comment_platform,
+					comment_ip,
 					comment_hostId)
 		VALUES(#{comment_author.visitor_id}, 
 				#{comment_referComment.comment_id}, 
 				#{comment_content}, 
 				#{comment_releaseTime},
 				#{comment_platform},
+				#{comment_ip.ip_id},
 				#{comment_hostArticle.article_id})
 		<selectKey resultType="int" keyProperty="comment_id" order="AFTER">
 			select @@identity
@@ -194,6 +269,7 @@
 			comment_releaseTime = #{comment_releaseTime},
 			comment_hostId = #{comment_hostArticle.article_id},
 			comment_platform = #{comment_platform},
+			comment_ip = #{comment_ip.ip_id},
 			comment_haveSubComment = #{comment_haveSubComment}
 		WHERE
 			comment_id = #{comment_id}

@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.github.qcloudsms.httpclient.HTTPException;
 import com.google.gson.Gson;
 import com.pengblog.bean.SendSmsResult;
-import com.pengblog.service.IsmsService;
+import com.pengblog.serviceInterface.IsmsService;
 
 @Controller
 @RequestMapping("/sms")

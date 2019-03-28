@@ -1,8 +1,7 @@
 package com.pengblog.service;
 
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Date;
 import java.util.UUID;
 
 import org.apache.logging.log4j.LogManager;
@@ -17,10 +16,10 @@ import com.pengblog.constant.PengblogConstant;
 import com.pengblog.dao.IadministratorDao;
 import com.pengblog.jwt.JwtUtil;
 import com.pengblog.redis.RedisUtil;
+import com.pengblog.serviceInterface.IloginService;
 import com.pengblog.sms.SmsSender;
 import com.pengblog.utils.LogUtil;
 import com.pengblog.utils.Md5Util;
-import com.pengblog.utils.MyTokenUtil;
 
 @Service("loginService")
 public class LoginService implements IloginService{
@@ -78,14 +77,16 @@ public class LoginService implements IloginService{
 			
 			loginResult.setMessage("sign in success");
 			
-			String token = JwtUtil.createJWT(UUID.randomUUID().toString(), administrator.getAdministrator_username(), PengblogConstant.JWT_EXPIRE_TIME_LONG);
+			String token = JwtUtil.createJWT(UUID.randomUUID().toString(), administrator.getAdministrator_username(), PengblogConstant.JWT_EXPIRE_TIME_MILLI_SECOND_LONG);
 			
 			loginResult.setToken(token);
 			
-			loginResult.setValidTimeMillis(PengblogConstant.JWT_EXPIRE_TIME_LONG);
+			loginResult.setValidTimeMillis(PengblogConstant.JWT_EXPIRE_TIME_MILLI_SECOND_LONG);
+			
+			RedisUtil.setStringKV(token, (new Date()).toString(), PengblogConstant.JWT_EXPIRE_TIME_SECOND_LONG, 4);
 			
 			logger.info(LogUtil.infoBegin);
-			logger.info("管理员" + administrator.getAdministrator_username() + "登录成功，登录时长6000000ms");
+			logger.info("登录成功");
 			logger.info(LogUtil.infoEnd);
 		}
 		
@@ -147,15 +148,17 @@ public class LoginService implements IloginService{
 		
 		loginResult.setMessage("sign in success");
 		
-		String token = JwtUtil.createJWT(UUID.randomUUID().toString(), phoneNumber, PengblogConstant.JWT_EXPIRE_TIME_LONG);
+		String token = JwtUtil.createJWT(UUID.randomUUID().toString(), phoneNumber, PengblogConstant.JWT_EXPIRE_TIME_MILLI_SECOND_LONG);
 		
 		loginResult.setToken(token);
 		
-		loginResult.setValidTimeMillis(PengblogConstant.JWT_EXPIRE_TIME_LONG);
+		loginResult.setValidTimeMillis(PengblogConstant.JWT_EXPIRE_TIME_MILLI_SECOND_LONG);
 		
 		logger.info(LogUtil.infoBegin);
-		logger.info("登录失败，输入了错误的动态密码");
+		logger.info("登录成功");
 		logger.info(LogUtil.infoEnd);
+		
+		RedisUtil.setStringKV(token, (new Date()).toString(), PengblogConstant.JWT_EXPIRE_TIME_SECOND_LONG, 4);
 		
 		return loginResult;
 		

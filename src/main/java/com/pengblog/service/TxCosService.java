@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
+import com.pengblog.serviceInterface.ItxCosService;
 import com.pengblog.utils.LogUtil;
 import com.pengblog.utils.MyFileUtil;
 import com.qcloud.cos.COSClient;

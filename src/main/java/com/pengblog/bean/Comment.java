@@ -5,6 +5,11 @@ import java.util.Date;
 
 public class Comment implements Serializable{
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 	private Integer comment_id;
 	
 	private Visitor comment_author;
@@ -20,6 +25,8 @@ public class Comment implements Serializable{
 	private Boolean comment_haveSubComment;
 	
 	private String comment_platform;
+	
+	private IpObject comment_ip;
 
 	/**
 	 * @return the comment_id
@@ -94,8 +101,6 @@ public class Comment implements Serializable{
 	public void setComment_haveSubComment(Boolean comment_haveSubComment) {
 		this.comment_haveSubComment = comment_haveSubComment;
 	}
-	
-	
 
 	public String getComment_platform() {
 		return comment_platform;
@@ -105,12 +110,21 @@ public class Comment implements Serializable{
 		this.comment_platform = comment_platform;
 	}
 
-	
+	public IpObject getComment_ip() {
+		return comment_ip;
+	}
 
+	public void setComment_ip(IpObject comment_ip) {
+		this.comment_ip = comment_ip;
+	}
+
+	public static long getSerialversionuid() {
+		return serialVersionUID;
+	}
 
 	public Comment(Integer comment_id, Visitor comment_author, Comment comment_referComment, String comment_content,
 			Date comment_releaseTime, Article comment_hostArticle, Boolean comment_haveSubComment,
-			String comment_platform) {
+			String comment_platform, IpObject ipObject) {
 		super();
 		this.comment_id = comment_id;
 		this.comment_author = comment_author;
@@ -120,6 +134,7 @@ public class Comment implements Serializable{
 		this.comment_hostArticle = comment_hostArticle;
 		this.comment_haveSubComment = comment_haveSubComment;
 		this.comment_platform = comment_platform;
+		this.comment_ip = ipObject;
 	}
 
 	/**

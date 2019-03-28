@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.google.gson.Gson;
 import com.pengblog.bean.CaptchaResult;
-import com.pengblog.service.IcaptchaService;
+import com.pengblog.serviceInterface.IcaptchaService;
 import com.pengblog.utils.MyFileUtil;
 
 

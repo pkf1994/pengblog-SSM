@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.pengblog.service;
+package com.pengblog.serviceInterface;
 
 import java.util.List;
 import java.util.Map;
@@ -21,6 +21,8 @@ public interface IcommentService {
 	int getMaxPage(int hostId, int pageScale);
 
 	Comment[] getCommentList(int hostId, int startIndex, int pageScale);
+	
+	Comment[] getCommentListWithIP(int hostId, int startIndex, int pageScale);
 	
 	Comment[] getTopLevelCommentList(int hostId, int startIndex, int pageScale);
 
@@ -55,5 +57,10 @@ public interface IcommentService {
 	int getCountOfAllComment();
 
 	Boolean checkWhetherNeedCaptcha(String clientIP);
+
+	Comment[] getTopLevelCommentListWithIP(int article_id, int startIndex, int pageScale);
+
+	Comment[] getSubCommentListWithIP(int comment_id, int startIndex, int pageScale);
+	
 
 }

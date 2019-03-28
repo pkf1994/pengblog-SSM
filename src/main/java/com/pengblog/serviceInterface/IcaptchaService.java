@@ -1,4 +1,4 @@
-package com.pengblog.service;
+package com.pengblog.serviceInterface;
 
 import java.awt.image.BufferedImage;
 

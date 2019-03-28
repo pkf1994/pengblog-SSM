@@ -13,6 +13,7 @@ import com.google.code.kaptcha.impl.DefaultKaptcha;
 import com.pengblog.bean.CaptchaResult;
 import com.pengblog.captcha.CaptchaCodeGenerator;
 import com.pengblog.redis.RedisUtil;
+import com.pengblog.serviceInterface.IcaptchaService;
 
 @Service("captchaService")
 public class CaptchaService implements IcaptchaService {

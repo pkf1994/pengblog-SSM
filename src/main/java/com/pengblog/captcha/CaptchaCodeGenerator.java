@@ -2,10 +2,13 @@ package com.pengblog.captcha;
 
 import java.util.Random;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import com.pengblog.constant.PengblogConstant;
 
 public class CaptchaCodeGenerator {
 	
-	private static int size = 4;
 	
 	private static Random random = new Random();
 
@@ -19,7 +22,7 @@ public class CaptchaCodeGenerator {
 		String captchaCode = "";
 	    
 	    //绘制字母数字
-    	for (int i = 0; i < size; i++){
+    	for (int i = 0; i < PengblogConstant.CAPTCHA_CODE_SIZE; i++){
 	    	
     		captchaCode += ch[random.nextInt(ch.length)];
 	       
@@ -43,4 +46,5 @@ public class CaptchaCodeGenerator {
 	}
 
 
+	
 }

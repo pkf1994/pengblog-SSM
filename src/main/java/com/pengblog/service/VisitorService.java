@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import com.pengblog.bean.Visitor;
 import com.pengblog.dao.IvisitorDao;
+import com.pengblog.serviceInterface.IvisitorService;
 import com.pengblog.utils.LogUtil;
 
 @Service("visitorService")

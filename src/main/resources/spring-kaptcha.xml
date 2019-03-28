@@ -31,5 +31,4 @@
         <property name="config" ref="kaptchaConfig"/>
     </bean>
     
-
 </beans>

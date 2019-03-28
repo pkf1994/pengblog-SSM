@@ -16,7 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.google.gson.Gson;
 import com.peng.annotation.RequireToken;
-import com.pengblog.service.ItxCosService;
+import com.pengblog.serviceInterface.ItxCosService;
 import com.pengblog.utils.MyFileUtil;
 
 @Controller

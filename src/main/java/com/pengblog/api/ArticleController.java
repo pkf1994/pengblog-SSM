@@ -15,7 +15,7 @@ import com.google.gson.Gson;
 import com.peng.annotation.FrontEndCacheable;
 import com.peng.annotation.RequireToken;
 import com.pengblog.bean.Article;
-import com.pengblog.service.IarticleService;
+import com.pengblog.serviceInterface.IarticleService;
 
 /**
  * @author Peng Kaifan

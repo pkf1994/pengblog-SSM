@@ -24,14 +24,17 @@ import com.peng.annotation.RecordClientIP;
 import com.peng.annotation.RequireToken;
 import com.pengblog.bean.CaptchaResult;
 import com.pengblog.bean.Comment;
+import com.pengblog.bean.IpObject;
 import com.pengblog.bean.SubmitCommentResult;
 import com.pengblog.bean.Visitor;
+import com.pengblog.constant.PengblogConstant;
 import com.pengblog.interceptor.RecordClientIPInterceptor;
 import com.pengblog.redis.RedisUtil;
 import com.pengblog.service.CommentService;
-import com.pengblog.service.IcaptchaService;
-import com.pengblog.service.IcommentService;
-import com.pengblog.service.IvisitorService;
+import com.pengblog.serviceInterface.IcaptchaService;
+import com.pengblog.serviceInterface.IcommentService;
+import com.pengblog.serviceInterface.IipService;
+import com.pengblog.serviceInterface.IvisitorService;
 
 /**
  * @author Administrator
@@ -53,17 +56,29 @@ public class CommentController {
 	@Qualifier("captchaService")
 	private IcaptchaService captchaService;
 	
+	@Autowired
+	@Qualifier("ipService")
+	private IipService ipService;
+	
 
 	@FrontEndCacheable
 	@RequestMapping(value="/comment_list.do", produces="application/json;charset=UTF-8")
 	@ResponseBody
-	public Object getCommentList(int article_id, int startIndex, int pageScale) {
+	public Object getCommentList(HttpServletRequest request, int article_id, int startIndex, int pageScale) {
 		
 		int maxPage = commentService.getMaxPage(article_id, pageScale);
 		
 		int countOfComment = commentService.getCountOfComment(article_id);
 		
-		Comment[] commentList = commentService.getCommentList(article_id, startIndex, pageScale);
+		String token = request.getHeader("Authorization");
+		
+		Comment[] commentList;
+		
+		if(token != null && RedisUtil.getStringKV(token, PengblogConstant.REDIS_TOKEN_DBINDEX) != null) {
+			commentList = commentService.getCommentListWithIP(article_id, startIndex, pageScale);
+		}else {
+			commentList = commentService.getCommentList(article_id, startIndex, pageScale);
+		}
 		
 		Gson gson = new Gson();
 		Map<String,Object> ret = new HashMap<>();
@@ -80,13 +95,21 @@ public class CommentController {
 	@FrontEndCacheable
 	@RequestMapping(value="/top_level_comment_list.do", produces="application/json;charset=UTF-8")
 	@ResponseBody
-	public Object getTopLevelCommentList(int article_id, int startIndex, int pageScale) {
+	public Object getTopLevelCommentList(HttpServletRequest request, int article_id, int startIndex, int pageScale) {
 		
 		int maxPage = commentService.getMaxPageOfTopLevelComment(article_id, pageScale);
 		
 		int countOfComment = commentService.getCountOfComment(article_id);
 		
-		Comment[] commentList = commentService.getTopLevelCommentList(article_id, startIndex, pageScale);
+		String token = request.getHeader("Authorization");
+		
+		Comment[] commentList;
+		
+		if(token != null && RedisUtil.getStringKV(token, PengblogConstant.REDIS_TOKEN_DBINDEX) != null) {
+			commentList = commentService.getTopLevelCommentListWithIP(article_id, startIndex, pageScale);
+		}else {
+			commentList = commentService.getTopLevelCommentList(article_id, startIndex, pageScale);
+		}
 		
 		Gson gson = new Gson();
 		Map<String,Object> ret = new HashMap<>();
@@ -103,13 +126,23 @@ public class CommentController {
 	@FrontEndCacheable
 	@RequestMapping(value="/sub_comment_list.do", produces="application/json;charset=UTF-8")
 	@ResponseBody
-	public Object getSubCommentList(int comment_id, int startIndex, int pageScale) {
+	public Object getSubCommentList(HttpServletRequest request, int comment_id, int startIndex, int pageScale) {
 		
 		int maxPage = commentService.getMaxPageOfSubComment(comment_id, pageScale);
 		
 		int countOfSubComment = commentService.getCountOfSubComment(comment_id);
 		
-		Comment[] subCommentList = commentService.getSubCommentList(comment_id, startIndex, pageScale);
+
+		String token = request.getHeader("Authorization");
+		
+		Comment[] subCommentList;
+		
+		if(token != null && RedisUtil.getStringKV(token, PengblogConstant.REDIS_TOKEN_DBINDEX) != null) {
+			subCommentList = commentService.getSubCommentListWithIP(comment_id, startIndex, pageScale);
+		}else {
+			subCommentList = commentService.getSubCommentList(comment_id, startIndex, pageScale);
+		}
+		
 		
 		Gson gson = new Gson();
 		Map<String,Object> ret = new HashMap<>();
@@ -143,6 +176,8 @@ public class CommentController {
 	public Object submitComment(@RequestBody Map<String, String> commentData, HttpServletRequest request) throws UnsupportedEncodingException {
 		
 		String clientIP = request.getHeader("X-Real-IP");
+		
+		IpObject ipObject = ipService.save(clientIP);
 		
 		Boolean needCaptcha = commentService.checkWhetherNeedCaptcha(clientIP);
 		
@@ -179,8 +214,9 @@ public class CommentController {
 		
 		comment.setComment_author(visitor);
 		
-		commentService.saveComment(comment);
+		comment.setComment_ip(ipObject);
 		
+		commentService.saveComment(comment);
 		
 		submitCommentResult.setSuccess(true);
 		
@@ -254,6 +290,8 @@ public class CommentController {
 		
 		return needCaptcha;
 	}
+	
+
 	
 }
 

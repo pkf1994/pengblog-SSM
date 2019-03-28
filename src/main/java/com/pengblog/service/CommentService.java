@@ -18,6 +18,7 @@ import com.pengblog.bean.Visitor;
 import com.pengblog.dao.IcommentDao;
 import com.pengblog.interceptor.RecordClientIPInterceptor;
 import com.pengblog.redis.RedisUtil;
+import com.pengblog.serviceInterface.IcommentService;
 import com.pengblog.utils.LogUtil;
 
 /**
@@ -52,6 +53,8 @@ public class CommentService implements IcommentService{
 		
 		return commentList;
 	}
+	
+	
 
 	@Override
 	public int getCountOfComment(int hostId) {
@@ -183,6 +186,12 @@ public class CommentService implements IcommentService{
 	}
 
 	@Override
+	public Comment[] getTopLevelCommentListWithIP(int article_id, int startIndex, int pageScale) {
+		Comment[] commentList = commentDao.selectTopLevelCommentLisWithIPtByLimitIndex(article_id, startIndex, pageScale);
+		return commentList;
+	}
+	
+	@Override
 	public int getCountOfSecondaryComment(int comment_id) {
 		int count = commentDao.selectCountOfSecondaryComment(comment_id);
 		
@@ -233,6 +242,14 @@ public class CommentService implements IcommentService{
 		
 		return subCommentList;
 	}
+	
+
+	@Override
+	public Comment[] getSubCommentListWithIP(int comment_id, int startIndex, int pageScale) {
+		Comment[] subCommentList = commentDao.selectSubCommentListWithIPByLimitIndex(comment_id, startIndex, pageScale);
+		
+		return subCommentList;
+	}
 
 	@Override
 	public int getCountOfAllComment() {
@@ -268,6 +285,17 @@ public class CommentService implements IcommentService{
 		//该ip最近提交评论次数大于等于5，需要输入验证码
 		return true;
 	}
+
+	@Override
+	public Comment[] getCommentListWithIP(int hostId, int startIndex, int pageScale) {
+		// TODO Auto-generated method stub
+		
+		Comment[] commentList = commentDao.selectCommentListWithIPByLimitIndex(hostId, startIndex, pageScale);
+		
+		return commentList;
+	}
+
+
 
 
 }

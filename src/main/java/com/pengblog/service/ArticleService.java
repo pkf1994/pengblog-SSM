@@ -21,6 +21,8 @@ import org.springframework.transaction.annotation.Transactional;
 import com.pengblog.bean.Article;
 import com.pengblog.dao.IarticleDao;
 import com.pengblog.dao.IcommentDao;
+import com.pengblog.serviceInterface.IarticleService;
+import com.pengblog.serviceInterface.ItxCosService;
 import com.pengblog.utils.ArticleFields;
 import com.pengblog.utils.LogUtil;
 import com.pengblog.utils.MyHtmlUtil;

@@ -12,6 +12,7 @@ import com.github.qcloudsms.httpclient.HTTPException;
 import com.pengblog.bean.SendSmsResult;
 import com.pengblog.captcha.CaptchaCodeGenerator;
 import com.pengblog.redis.RedisUtil;
+import com.pengblog.serviceInterface.IsmsService;
 import com.pengblog.sms.SmsSender;
 
 @Service("smsService")

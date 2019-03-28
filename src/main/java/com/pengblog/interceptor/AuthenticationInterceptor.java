@@ -20,7 +20,7 @@ import com.peng.exception.AuthenticationException;
 import com.pengblog.bean.Administrator;
 import com.pengblog.jwt.JwtTokenCheckResult;
 import com.pengblog.jwt.JwtUtil;
-import com.pengblog.service.IadministratorService;
+import com.pengblog.serviceInterface.IadministratorService;
 import com.pengblog.utils.LogUtil;
 import com.pengblog.utils.MyTokenUtil;
 

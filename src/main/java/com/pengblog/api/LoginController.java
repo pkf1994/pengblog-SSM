@@ -12,8 +12,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.google.gson.Gson;
 import com.pengblog.bean.CaptchaResult;
 import com.pengblog.bean.LoginResult;
-import com.pengblog.service.IcaptchaService;
-import com.pengblog.service.IloginService;
+import com.pengblog.serviceInterface.IcaptchaService;
+import com.pengblog.serviceInterface.IloginService;
 
 @Controller
 @RequestMapping("/login")
