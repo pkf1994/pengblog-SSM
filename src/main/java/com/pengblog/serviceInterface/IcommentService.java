@@ -22,8 +22,6 @@ public interface IcommentService {
 
 	Comment[] getCommentList(int hostId, int startIndex, int pageScale);
 	
-	Comment[] getCommentListWithIP(int hostId, int startIndex, int pageScale);
-	
 	Comment[] getTopLevelCommentList(int hostId, int startIndex, int pageScale);
 
 	int getCountOfComment(int article_id);
@@ -58,9 +56,11 @@ public interface IcommentService {
 
 	Boolean checkWhetherNeedCaptcha(String clientIP);
 
-	Comment[] getTopLevelCommentListWithIP(int article_id, int startIndex, int pageScale);
+	Comment[] getCommentList(int article_id, int startIndex, int pageScale, String token);
 
-	Comment[] getSubCommentListWithIP(int comment_id, int startIndex, int pageScale);
+	Comment[] getTopLevelCommentList(int article_id, int startIndex, int pageScale, String token);
+
+	Comment[] getSubCommentList(int comment_id, int startIndex, int pageScale, String token);
 	
 
 }

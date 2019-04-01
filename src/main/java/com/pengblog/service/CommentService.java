@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import com.pengblog.bean.Article;
 import com.pengblog.bean.Comment;
 import com.pengblog.bean.Visitor;
+import com.pengblog.constant.PengblogConstant;
 import com.pengblog.dao.IcommentDao;
 import com.pengblog.interceptor.RecordClientIPInterceptor;
 import com.pengblog.redis.RedisUtil;
@@ -185,11 +186,6 @@ public class CommentService implements IcommentService{
 		return commentList;
 	}
 
-	@Override
-	public Comment[] getTopLevelCommentListWithIP(int article_id, int startIndex, int pageScale) {
-		Comment[] commentList = commentDao.selectTopLevelCommentLisWithIPtByLimitIndex(article_id, startIndex, pageScale);
-		return commentList;
-	}
 	
 	@Override
 	public int getCountOfSecondaryComment(int comment_id) {
@@ -245,13 +241,6 @@ public class CommentService implements IcommentService{
 	
 
 	@Override
-	public Comment[] getSubCommentListWithIP(int comment_id, int startIndex, int pageScale) {
-		Comment[] subCommentList = commentDao.selectSubCommentListWithIPByLimitIndex(comment_id, startIndex, pageScale);
-		
-		return subCommentList;
-	}
-
-	@Override
 	public int getCountOfAllComment() {
 		
 		int countOfComment = commentDao.selectCountOfComment();
@@ -287,15 +276,46 @@ public class CommentService implements IcommentService{
 	}
 
 	@Override
-	public Comment[] getCommentListWithIP(int hostId, int startIndex, int pageScale) {
-		// TODO Auto-generated method stub
+	public Comment[] getCommentList(int article_id, int startIndex, int pageScale, String token) {
 		
-		Comment[] commentList = commentDao.selectCommentListWithIPByLimitIndex(hostId, startIndex, pageScale);
+		Comment[] commentList;
+		
+		if(token != null && RedisUtil.getStringKV(token, PengblogConstant.REDIS_TOKEN_DBINDEX) != null) {
+			commentList = commentDao.selectCommentListWithIPByLimitIndex(article_id, startIndex, pageScale);
+		}else {
+			commentList = commentDao.selectCommentListByLimitIndex(article_id, startIndex, pageScale);
+		}
 		
 		return commentList;
 	}
 
+	@Override
+	public Comment[] getTopLevelCommentList(int article_id, int startIndex, int pageScale, String token) {
+		// TODO Auto-generated method stub
+		
+		Comment[] commentList;
+		
+		if(token != null && RedisUtil.getStringKV(token, PengblogConstant.REDIS_TOKEN_DBINDEX) != null) {
+			commentList = commentDao.selectTopLevelCommentListWithIPByLimitIndex(article_id, startIndex, pageScale);
+		}else {
+			commentList = commentDao.selectTopLevelCommentListByLimitIndex(article_id, startIndex, pageScale);
+		}
+	
+		return commentList;
+	}
 
-
+	@Override
+	public Comment[] getSubCommentList(int comment_id, int startIndex, int pageScale, String token) {
+		// TODO Auto-generated method stub
+		Comment[] commentList;
+		
+		if(token != null && RedisUtil.getStringKV(token, PengblogConstant.REDIS_TOKEN_DBINDEX) != null) {
+			commentList = commentDao.selectSubCommentListWithIPByLimitIndex(comment_id, startIndex, pageScale);
+		}else {
+			commentList = commentDao.selectSubCommentListByLimitIndex(comment_id, startIndex, pageScale);
+		}
+	
+		return commentList;
+	}
 
 }

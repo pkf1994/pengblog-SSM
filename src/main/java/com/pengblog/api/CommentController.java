@@ -3,8 +3,6 @@
  */
 package com.pengblog.api;
 
-import java.io.UnsupportedEncodingException;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -27,10 +25,6 @@ import com.pengblog.bean.Comment;
 import com.pengblog.bean.IpObject;
 import com.pengblog.bean.SubmitCommentResult;
 import com.pengblog.bean.Visitor;
-import com.pengblog.constant.PengblogConstant;
-import com.pengblog.interceptor.RecordClientIPInterceptor;
-import com.pengblog.redis.RedisUtil;
-import com.pengblog.service.CommentService;
 import com.pengblog.serviceInterface.IcaptchaService;
 import com.pengblog.serviceInterface.IcommentService;
 import com.pengblog.serviceInterface.IipService;
@@ -72,13 +66,7 @@ public class CommentController {
 		
 		String token = request.getHeader("Authorization");
 		
-		Comment[] commentList;
-		
-		if(token != null && RedisUtil.getStringKV(token, PengblogConstant.REDIS_TOKEN_DBINDEX) != null) {
-			commentList = commentService.getCommentListWithIP(article_id, startIndex, pageScale);
-		}else {
-			commentList = commentService.getCommentList(article_id, startIndex, pageScale);
-		}
+		Comment[] commentList = commentService.getCommentList(article_id, startIndex, pageScale, token);
 		
 		Gson gson = new Gson();
 		Map<String,Object> ret = new HashMap<>();
@@ -103,13 +91,7 @@ public class CommentController {
 		
 		String token = request.getHeader("Authorization");
 		
-		Comment[] commentList;
-		
-		if(token != null && RedisUtil.getStringKV(token, PengblogConstant.REDIS_TOKEN_DBINDEX) != null) {
-			commentList = commentService.getTopLevelCommentListWithIP(article_id, startIndex, pageScale);
-		}else {
-			commentList = commentService.getTopLevelCommentList(article_id, startIndex, pageScale);
-		}
+		Comment[] commentList = commentService.getTopLevelCommentList(article_id, startIndex, pageScale, token);
 		
 		Gson gson = new Gson();
 		Map<String,Object> ret = new HashMap<>();
@@ -135,19 +117,12 @@ public class CommentController {
 
 		String token = request.getHeader("Authorization");
 		
-		Comment[] subCommentList;
-		
-		if(token != null && RedisUtil.getStringKV(token, PengblogConstant.REDIS_TOKEN_DBINDEX) != null) {
-			subCommentList = commentService.getSubCommentListWithIP(comment_id, startIndex, pageScale);
-		}else {
-			subCommentList = commentService.getSubCommentList(comment_id, startIndex, pageScale);
-		}
-		
+		Comment[] commentList = commentService.getSubCommentList(comment_id, startIndex, pageScale, token);
 		
 		Gson gson = new Gson();
 		Map<String,Object> ret = new HashMap<>();
 		ret.put("maxPage", maxPage);
-		ret.put("subCommentList", subCommentList);
+		ret.put("subCommentList", commentList);
 		ret.put("countOfSubComment", countOfSubComment);
 		String retJson = gson.toJson(ret);
 		
@@ -173,7 +148,9 @@ public class CommentController {
 	@RecordClientIP
 	@RequestMapping(value="/submit_comment.do", produces="application/json;charset=UTF-8")
 	@ResponseBody
-	public Object submitComment(@RequestBody Map<String, String> commentData, HttpServletRequest request) throws UnsupportedEncodingException {
+	public Object submitComment(HttpServletRequest request, @RequestBody Map<String, String> commentData) throws Exception {
+		
+		//return ReturnVo.ok(request.getHeader("X-Real-IP"));
 		
 		String clientIP = request.getHeader("X-Real-IP");
 		
@@ -185,25 +162,21 @@ public class CommentController {
 		
 		if(needCaptcha) {
 			
-			String captchaId = commentData.get("captchaId");
+			String captchaId = (String)commentData.get("captchaId");
 			
-			String captchaCode = commentData.get("captchaCode");
+			String captchaCode = (String)commentData.get("captchaCode");
 			
 			CaptchaResult captchaResult = captchaService.checkCaptchaCode(captchaId,captchaCode);
 			
 			if(captchaResult.getPass() == false) {
 				
-				submitCommentResult.setSuccess(false);
-				
-				submitCommentResult.setMessage("绕过验证码的非法提交");
-				
-				Gson gson = new Gson();
-				
-				String retJson = gson.toJson(submitCommentResult);
-				
-				return retJson;
+				return ReturnVo.err("绕过验证码的非法提交");
 				
 			}
+		}
+		
+		if(ipObject.getIp_isBanned()) {
+			return ReturnVo.err("被封禁的IP无法提交评论");
 		}
 		
 		Comment comment = commentService.constructComment(commentData);
@@ -222,12 +195,8 @@ public class CommentController {
 		
 		submitCommentResult.setCommentIdJustSubmit(comment.getComment_id());
 		
-		Gson gson = new Gson();
-		
-		String retJson = gson.toJson(submitCommentResult);
+		return ReturnVo.ok(submitCommentResult);
 	
-		return retJson;
-		
 	}
 	
 	@FrontEndCacheable

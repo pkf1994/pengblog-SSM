@@ -42,6 +42,8 @@ public class RecordClientIPInterceptor implements HandlerInterceptor {
 	public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex)
 			throws Exception {
 		
+		
+		//记录客户端IP及请求次数
 		String ip = request.getHeader("X-Real-IP");
 		
 		if(ip == null) {
@@ -51,6 +53,7 @@ public class RecordClientIPInterceptor implements HandlerInterceptor {
 		if(ipService.getIpByIp(ip) == null) {
 			ipService.save(ip);
 		};
+		
 		 
 		HandlerMethod handlerMethod = (HandlerMethod) handler;
 		

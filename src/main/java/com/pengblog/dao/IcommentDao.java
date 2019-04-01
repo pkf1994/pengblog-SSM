@@ -44,7 +44,7 @@ public interface IcommentDao {
 
 	Comment[] selectCommentListWithIPByLimitIndex(@Param("hostId")int hostId, @Param("startIndex")int startIndex, @Param("pageScale")int pageScale);
 
-	Comment[] selectTopLevelCommentLisWithIPtByLimitIndex(@Param("hostId")int article_id, @Param("startIndex")int startIndex, @Param("pageScale")int pageScale);
+	Comment[] selectTopLevelCommentListWithIPByLimitIndex(@Param("hostId")int article_id, @Param("startIndex")int startIndex, @Param("pageScale")int pageScale);
 
 	Comment[] selectSubCommentListWithIPByLimitIndex(@Param("comment_id")int comment_id, @Param("startIndex")int startIndex, @Param("pageScale")int pageScale);
 	

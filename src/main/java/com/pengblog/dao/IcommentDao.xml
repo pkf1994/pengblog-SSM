@@ -148,7 +148,7 @@
 			#{startIndex}, #{pageScale}
 	</select>
 	
-	<select id="selectTopLevelCommentLisWithIPtByLimitIndex" resultMap="commentMapper">
+	<select id="selectTopLevelCommentListWithIPByLimitIndex" resultMap="commentMapper">
 		SELECT * FROM
 			comment
 		WHERE
