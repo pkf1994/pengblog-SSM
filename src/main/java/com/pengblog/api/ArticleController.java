@@ -95,8 +95,11 @@ public class ArticleController {
 		}
 		
 		if(article.getArticle_type().equals("article")) {
-			articleService.handlePreviewImage(article);
+			
 			article = articleService.handleImageUrl(article);
+			
+			articleService.handlePreviewImage(article);
+			
 		}
 		
 		articleService.updateArticle(article);
