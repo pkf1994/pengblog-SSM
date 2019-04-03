@@ -70,10 +70,21 @@
 		UPDATE 
 			article
 		SET
-			isdeleted = 1
+			isdeleted = 1,
+			article_deleteTime = #{article_deleteTime}
 		WHERE
 			article_id = #{article_id}
 	</update>
+	
+	<update id="recoverArticleById">
+		UPDATE 
+			article
+		SET
+			isdeleted = 0
+		WHERE
+			article_id = #{article_id}
+	</update>
+	
 	
 	<update id="updateArticle">
 		UPDATE 
@@ -85,6 +96,7 @@
 			article_summary = #{article_summary},
 			article_content = #{article_content},
 			article_releaseTime = #{article_releaseTime},
+			article_deleteTime = #{article_deleteTime},
 			article_type = #{article_type},
 			article_previewImageUrl = #{article_previewImageUrl},
 			article_titleImageUrl = #{article_titleImageUrl}
@@ -214,5 +226,51 @@
 		AND
 			isdeleted = 0
 	</select>
-
+	
+	<select id="selectDeletedArticleByLimitIndex" resultType="Article">
+		SELECT
+		<foreach collection="paramList" open="" close="" separator="," item="field">
+				${field}
+		</foreach>
+		FROM
+			article
+		WHERE
+			isdeleted = 1
+		AND
+			article_type = "article"
+		ORDER BY 
+			article_deleteTime
+		DESC	
+		LIMIT
+			#{startIndex}, #{pageScale}
+	</select>
+	
+	<select id="selectCountOfDeletedArticle" resultType="int">
+		SELECT COUNT(*) FROM
+			article
+		WHERE 
+			isdeleted = 1
+		AND
+			article_type = "article"
+	</select>
+	
+	<select id="selectAllArticleIdDeleted" resultType="java.lang.Integer">
+		SELECT 
+			article_id
+		FROM
+			article
+		WHERE
+			isdeleted = 1
+	</select>
+	
+	<delete id="destroyArticleById">  
+        DELETE 
+        FROM 
+        	article
+        WHERE 
+        	article_id = #{article_id}  
+	</delete>  
+	
+	
+	
 </mapper>

@@ -175,7 +175,7 @@ public class CommentController {
 			}
 		}
 		
-		if(ipObject.getIp_isBanned()) {
+		if(null != ipObject.getIp_isBanned() && ipObject.getIp_isBanned()) {
 			return ReturnVo.err("被封禁的IP无法提交评论");
 		}
 		

@@ -43,6 +43,8 @@ public interface IarticleService {
 	int getMaxPageOfDraft(int pageScale);
 
 	void deleteArticleById(int article_id);
+	
+	void destroyArticleById(int article_id);
 
 	void updateArticle(Article handledArticle);
 
@@ -76,5 +78,14 @@ public interface IarticleService {
 
 	Article getDraft();
 
+	int getCountOfDeletedArticleList();
+
+	Article[] getDeletedArticleList(int startIndex, int pageScale);
+
+	int getMaxPageOfDeletedArticle(int pageScale);
+
+	void recoverArticle(int article_id);
+
+	void destroyAllArticleDeleted();
 
 }

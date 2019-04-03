@@ -39,7 +39,8 @@ public interface IarticleDao {
 
 	int selectCountOfDraft();
 
-	void deleteArticleById(int article_id);
+	void deleteArticleById(@Param("article_id")int article_id, 
+							@Param("article_deleteTime")Date date);
 
 	void updateArticle(Article handledArticle);
 
@@ -74,6 +75,23 @@ public interface IarticleDao {
 
 	int selectCountOfArticleByLabel(@Param("article_type")String article_type,
 									@Param("article_label")String article_label);
+
+
+	int selectCountOfDeletedArticle(String string);
+
+
+	Article[] selectDeletedArticleByLimitIndex(@Param("startIndex")int startIndex, 
+												@Param("pageScale")int pageScale, 
+												@Param("paramList")List<String> paramList);
+
+
+	void destroyArticleById(int article_id);
+
+
+	void recoverArticleById(int article_id);
+
+
+	Integer[] selectAllArticleIdDeleted();
 
 
 }

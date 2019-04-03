@@ -274,4 +274,12 @@
 		WHERE
 			comment_id = #{comment_id}
 	</update>
+	
+	<delete id="destroyCommentByArticleId">
+		DELETE
+		FROM
+			comment
+		WHERE
+			comment_hostId = #{comment_hostId}
+	</delete>
 </mapper>

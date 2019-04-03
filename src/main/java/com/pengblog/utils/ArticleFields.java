@@ -12,7 +12,8 @@ public enum ArticleFields {
 	ARTICLE_LABEL("article_label"),
 	ARTICLE_CONTENT("article_content"),
 	ARTICLE_RELEASETIME("article_releaseTime"),
-	ARTICLE_SUMMARY("article_summary");
+	ARTICLE_SUMMARY("article_summary"),
+	ARTICLE_DELETETIME("article_deleteTime");
 	
 	public final String fieldName;
 	

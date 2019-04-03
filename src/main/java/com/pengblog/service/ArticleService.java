@@ -239,17 +239,26 @@ public class ArticleService implements IarticleService{
 
 	@Transactional
 	public void deleteArticleById(int article_id) {
+		
+		commentDao.deleteCommentByArticleId(article_id);
+		
+		articleDao.deleteArticleById(article_id, new Date());
+		
+		logger.info(LogUtil.infoBegin);
+		logger.info("删除文章: " + article_id);
+		logger.info(LogUtil.infoEnd);
+		
+		
+	}
+	
+	@Transactional
+	public void destroyArticleById(int article_id) {
+		
+		commentDao.destroyCommentByArticleId(article_id);
+		
 		Article article = getArticleById(article_id);
 		
 		String article_content = article.getArticle_content();
-		
-		articleDao.deleteArticleById(article_id);
-		
-		logger.info(LogUtil.infoBegin);
-		logger.info("删除文章: " + article.getArticle_title() + "-" + article.getArticle_author() + "-" + article.getArticle_label());
-		logger.info(LogUtil.infoEnd);
-		
-		commentDao.deleteCommentByArticleId(article_id);
 		
 		Document doc = Jsoup.parse(article_content);
 		
@@ -268,7 +277,11 @@ public class ArticleService implements IarticleService{
 		//qiniuService.deleteImage(imgUrlList);
 		txCosService.deleteImage(imgUrlList, article_id);
 		
+		articleDao.destroyArticleById(article_id);
 		
+		logger.info(LogUtil.infoBegin);
+		logger.info("清除文章: " + article_id);
+		logger.info(LogUtil.infoEnd);
 	}
 
 	@Transactional
@@ -666,6 +679,57 @@ public class ArticleService implements IarticleService{
 		}
 		
 		return articleList[0];
+	}
+
+	@Override
+	public int getCountOfDeletedArticleList() {
+		
+		int countOfDeletedArticle = articleDao.selectCountOfDeletedArticle("article");
+		
+		return countOfDeletedArticle;
+	}
+
+	@Override
+	public Article[] getDeletedArticleList(int startIndex, int pageScale) {
+		List<String> paramList = new ArrayList<>();
+		
+		paramList.add("article_id");
+		paramList.add("article_title");
+		paramList.add("article_author");
+		paramList.add("article_deleteTime");
+		paramList.add("article_label");
+
+		Article[] articles = articleDao.selectDeletedArticleByLimitIndex(startIndex, pageScale, paramList);
+		
+		return articles;	
+	}
+
+	@Override
+	public int getMaxPageOfDeletedArticle(int pageScale) {
+		int countOfDeletedArticle = articleDao.selectCountOfDeletedArticle("article");
+		
+		int maxPage = (int) Math.ceil((double)(countOfDeletedArticle/pageScale)) + 1;
+		
+		return maxPage;
+	}
+
+	@Override
+	public void recoverArticle(int article_id) {
+		
+		articleDao.recoverArticleById(article_id);
+		
+		
+	}
+
+	@Override
+	public void destroyAllArticleDeleted() {
+		 
+		Integer[] ids = articleDao.selectAllArticleIdDeleted();
+		
+		for (int i = 0; i < ids.length; i++) {
+			destroyArticleById(ids[i]);
+		}
+		
 	}
 	
 }

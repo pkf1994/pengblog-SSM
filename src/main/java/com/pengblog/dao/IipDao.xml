@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pengblog.dao.IipDao">
+	
+	<insert id="insert">
+		INSERT INTO 
+			ip(ip_ip, ip_isBanned, ip_banTime)
+		VALUES(#{ip_ip}, #{ip_isBanned}, #{ip_banTime})
+		<selectKey resultType="int" keyProperty="ip_id" order="AFTER">
+			select @@identity
+		</selectKey>
+	</insert>
+	
+	<select id="selectIpById" resultType="com.pengblog.bean.IpObject">
+		SELECT 
+			*
+		FROM
+			ip
+		WHERE
+			ip_id = #{ip_id}
+	</select>
+	
+	
+	<select id="selectIpByIP" resultType="com.pengblog.bean.IpObject">
+		SELECT 
+			*
+		FROM
+			ip
+		WHERE
+			ip_ip = #{ip_ip}
+	</select>
+	
+	<update id="update">
+		UPDATE 
+			ip
+		SET
+			ip_ip = #{ip_ip},
+			ip_request_times = #{ip_request_times},
+			ip_isBanned = #{ip_isBanned},
+			ip_banTime = #{ip_banTime}
+		WHERE
+			ip_id = #{ip_id}
+	</update>
+	
+	<select id="selectCountOfIpObjectBeenBanned" resultType="int">
+		SELECT COUNT(*) FROM
+			ip
+		WHERE 
+			ip_isBanned = 1
+	</select>
+	
+	<!-- 根据参数列表获取 -->
+	<select id="selectIpListBeenBannedByLimitIndex" resultType="com.pengblog.bean.IpObject">
+		SELECT 
+		*
+		FROM
+			ip
+		WHERE
+			ip_isBanned = 1
+		ORDER BY 
+			ip_banTime
+		DESC	
+		LIMIT
+			#{startIndex}, #{pageScale}
+	</select> 
+</mapper>

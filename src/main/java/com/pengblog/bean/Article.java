@@ -10,6 +10,11 @@ import java.util.Date;
  */
 public class Article implements Serializable{
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 	private Integer article_id;
 	
 	private String article_title;
@@ -22,6 +27,8 @@ public class Article implements Serializable{
 	
 	private Date article_releaseTime;
 	
+	private Date article_deleteTime;
+	
 	private String article_label;
 	
 	private String article_type;
@@ -29,6 +36,16 @@ public class Article implements Serializable{
 	private String article_previewImageUrl;
 	
 	private String article_titleImageUrl;
+	
+	
+
+	public Date getArticle_deleteTime() {
+		return article_deleteTime;
+	}
+
+	public void setArticle_deleteTime(Date article_deleteTime) {
+		this.article_deleteTime = article_deleteTime;
+	}
 
 	/**
 	 * @return the article_id
@@ -159,9 +176,10 @@ public class Article implements Serializable{
 
 
 
+
 	public Article(Integer article_id, String article_title, String article_author, String article_content,
-			String article_summary, Date article_releaseTime, String article_label, String article_type,
-			String article_previewImageUrl, String article_titleImageUrl) {
+			String article_summary, Date article_releaseTime, Date article_deleteTime, String article_label,
+			String article_type, String article_previewImageUrl, String article_titleImageUrl) {
 		super();
 		this.article_id = article_id;
 		this.article_title = article_title;
@@ -169,6 +187,7 @@ public class Article implements Serializable{
 		this.article_content = article_content;
 		this.article_summary = article_summary;
 		this.article_releaseTime = article_releaseTime;
+		this.article_deleteTime = article_deleteTime;
 		this.article_label = article_label;
 		this.article_type = article_type;
 		this.article_previewImageUrl = article_previewImageUrl;

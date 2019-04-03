@@ -261,4 +261,59 @@ public class ArticleController {
 		return retJson;
 		
 	}
+	
+	@RequireToken
+	@FrontEndCacheable
+	@RequestMapping(value="/get_deleted_article_list.do",produces="application/json;charset=UTF-8")
+	@ResponseBody
+	public Object getDeletedArticleList(int startIndex,
+										int pageScale) throws Exception {
+		
+		int count = articleService.getCountOfDeletedArticleList();
+		
+		if(count == 0) {
+			return ReturnVo.ok(null);
+		}
+		
+		if(startIndex < 0 || startIndex > (count - 1)) {
+			return ReturnVo.err("bad startIndex");
+		}
+		
+		if(pageScale < 1) {
+			return ReturnVo.err("bad pageScale");
+		}
+		
+		Article[] articleList = articleService.getDeletedArticleList(startIndex, pageScale);
+		
+		int maxPage = articleService.getMaxPageOfDeletedArticle(pageScale);
+		
+		Map<String,Object> ret = new HashMap<String,Object>();
+		ret.put("articleList", articleList);
+		ret.put("maxPage", maxPage);
+		
+		return ReturnVo.ok(ret);
+
+	}
+	
+	@RequireToken
+	@RequestMapping(value="/recover_article.do",produces="application/json;charset=UTF-8")
+	@ResponseBody
+	public Object recoverArticle(int article_id) throws Exception {
+		
+		articleService.recoverArticle(article_id);
+		
+		return ReturnVo.ok("recover successfully");
+
+	}
+	
+	@RequireToken
+	@RequestMapping(value="/destroy_all_article_deleted.do",produces="application/json;charset=UTF-8")
+	@ResponseBody
+	public Object destroyAllArticleDeleted() throws Exception {
+		
+		articleService.destroyAllArticleDeleted();
+		
+		return ReturnVo.ok("clean successfully");
+
+	}
 }
