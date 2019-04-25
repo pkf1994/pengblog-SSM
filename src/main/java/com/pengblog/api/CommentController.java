@@ -87,7 +87,9 @@ public class CommentController {
 		
 		int maxPage = commentService.getMaxPageOfTopLevelComment(article_id, pageScale);
 		
-		int countOfComment = commentService.getCountOfComment(article_id);
+		int count = commentService.getCountOfTopComment(article_id);
+		
+		int countOfAllComment = commentService.getCountOfComment(article_id);
 		
 		String token = request.getHeader("Authorization");
 		
@@ -97,7 +99,8 @@ public class CommentController {
 		Map<String,Object> ret = new HashMap<>();
 		ret.put("maxPage", maxPage);
 		ret.put("commentList", commentList);
-		ret.put("countOfComment", countOfComment);
+		ret.put("count", count);
+		ret.put("countOfAllComment", countOfAllComment);
 		String retJson = gson.toJson(ret);
 		
 		System.out.println(retJson);
@@ -214,6 +217,8 @@ public class CommentController {
 		
 		List<Comment> comments = commentService.getCommentLastListByLimitIndex(startIndex, pageScale);
 		
+		int count = commentService.getCountOfAllComment();
+		
 		int maxPage = commentService.getMaxPageOfComment(pageScale);
 		
 		Map<String, Object> retMap = new HashMap<>();
@@ -221,6 +226,8 @@ public class CommentController {
 		retMap.put("commentList", comments);
 		
 		retMap.put("maxPage", maxPage);
+		
+		retMap.put("count", count);
 		
 		Gson gson = new Gson();
 		
@@ -239,12 +246,11 @@ public class CommentController {
 		return count;
 	}
 	
-	@RequireToken
 	@RequestMapping(value="/comment_delete.do", produces="application/json;charset=UTF-8")
 	@ResponseBody
 	public Object deleteCommentById(int comment_id) {
 		
-		commentService.deleteCommentById(comment_id);
+		commentService.destroyCommentById(comment_id);
 		
 		return "delete comment successful";
 	}

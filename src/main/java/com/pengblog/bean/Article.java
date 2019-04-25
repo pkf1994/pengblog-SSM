@@ -37,7 +37,17 @@ public class Article implements Serializable{
 	
 	private String article_titleImageUrl;
 	
+	private int article_countOfAllComment;
 	
+	
+
+	public int getArticle_countOfAllComment() {
+		return article_countOfAllComment;
+	}
+
+	public void setArticle_countOfAllComment(int article_countOfAllComment) {
+		this.article_countOfAllComment = article_countOfAllComment;
+	}
 
 	public Date getArticle_deleteTime() {
 		return article_deleteTime;
@@ -175,11 +185,10 @@ public class Article implements Serializable{
 	}
 
 
-
-
 	public Article(Integer article_id, String article_title, String article_author, String article_content,
 			String article_summary, Date article_releaseTime, Date article_deleteTime, String article_label,
-			String article_type, String article_previewImageUrl, String article_titleImageUrl) {
+			String article_type, String article_previewImageUrl, String article_titleImageUrl,
+			int article_countOfAllComment) {
 		super();
 		this.article_id = article_id;
 		this.article_title = article_title;
@@ -192,6 +201,7 @@ public class Article implements Serializable{
 		this.article_type = article_type;
 		this.article_previewImageUrl = article_previewImageUrl;
 		this.article_titleImageUrl = article_titleImageUrl;
+		this.article_countOfAllComment = article_countOfAllComment;
 	}
 
 	/**

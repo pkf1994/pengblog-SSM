@@ -39,8 +39,14 @@ public class CommentService implements IcommentService{
 		
 		int countOfComment = commentDao.selectCountOfCommentByHostId(hostId);
 		
-		int maxPage = (int) Math.ceil((double)(countOfComment/pageScale)) + 1;
+		int maxPage = (int) Math.floor((double)(countOfComment/pageScale));
 				
+		int remainder = countOfComment%pageScale;
+		
+		if(remainder != 0) {
+			return maxPage + 1;
+		}
+		
 		return maxPage;
 	}
 
@@ -156,8 +162,14 @@ public class CommentService implements IcommentService{
 
 		int countOfComment = commentDao.selectCountOfComment();
 		
-		int maxPage = (int) Math.ceil((double)(countOfComment/pageScale)) + 1;
+		int maxPage = (int) Math.floor((double)(countOfComment/pageScale));
 				
+		int remainder = countOfComment%pageScale;
+		
+		if(remainder != 0) {
+			return maxPage + 1;
+		}
+		
 		return maxPage;
 	}
 
@@ -180,6 +192,19 @@ public class CommentService implements IcommentService{
 		
 	}
 
+
+	@Override
+	public void destroyCommentById(int comment_id) {
+		
+		commentDao.destroyCommentById(comment_id);
+		
+		logger.info(LogUtil.infoBegin);
+		logger.info("删除评论: id" + comment_id);
+		logger.info(LogUtil.infoEnd);
+		
+	}
+	
+	
 	@Override
 	public Comment[] getTopLevelCommentList(int hostId, int startIndex, int pageScale) {
 		Comment[] commentList = commentDao.selectTopLevelCommentListByLimitIndex(hostId, startIndex, pageScale);
@@ -199,8 +224,14 @@ public class CommentService implements IcommentService{
 		
 		int countOfTopLevelComment = commentDao.selectCountOfTopLevelCommentByHostId(hostId);
 		
-		int maxPage = (int) Math.ceil((double)(countOfTopLevelComment/pageScale)) + 1;
+		int maxPage = (int) Math.floor((double)(countOfTopLevelComment/pageScale));
 				
+		int remainder = countOfTopLevelComment%pageScale;
+		
+		if(remainder != 0) {
+			return maxPage + 1;
+		}
+		
 		return maxPage;
 	}
 
@@ -208,7 +239,13 @@ public class CommentService implements IcommentService{
 	public int getMaxPageOfSecondaryComment(int comment_id, int pageScale) {
 		int countOfTopSecondaryComment = commentDao.selectCountOfSecondaryComment(comment_id);
 		
-		int maxPage = (int) Math.ceil((double)(countOfTopSecondaryComment/pageScale)) + 1;
+		int maxPage = (int) Math.floor((double)(countOfTopSecondaryComment/pageScale));
+		
+		int remainder = countOfTopSecondaryComment%pageScale;
+		
+		if(remainder != 0) {
+			return maxPage + 1;
+		}
 		
 		return maxPage;
 	}
@@ -218,8 +255,14 @@ public class CommentService implements IcommentService{
 		
 		int countOfSubComment = commentDao.selectCountOfSecondaryComment(comment_id);
 		
-		int maxPage = (int) Math.ceil((double)(countOfSubComment/pageScale)) + 1;
+		int maxPage = (int) Math.floor((double)(countOfSubComment/pageScale));
 				
+		int remainder = countOfSubComment%pageScale;
+		
+		if(remainder != 0) {
+			return maxPage + 1;
+		}
+		
 		return maxPage;
 	}
 
@@ -266,8 +309,8 @@ public class CommentService implements IcommentService{
 		
 		int times = Integer.parseInt(timesStr);
 		
-		//该ip最近提交评论次数小于5，则不需要输入验证码
-		if(times < 5) {
+		//该ip最近提交评论次数小于10，则不需要输入验证码
+		if(times < 10) {
 			return false;
 		}
 		
@@ -317,5 +360,14 @@ public class CommentService implements IcommentService{
 	
 		return commentList;
 	}
+
+	@Override
+	public int getCountOfTopComment(int article_id) {
+		
+		return commentDao.selectCountOfTopLevelCommentByHostId(article_id);
+		
+	}
+
+	
 
 }

@@ -83,7 +83,13 @@ public class ArticleService implements IarticleService{
 			
 		}
 		
-		int maxPage = (int) Math.ceil((double)(countOfAllArticle/pageScale)) + 1;
+		int maxPage = (int) Math.floor((double)(countOfAllArticle/pageScale));
+		
+		int remainder = countOfAllArticle%pageScale;
+		
+		if(remainder != 0) {
+			return maxPage + 1;
+		}
 		
 		return maxPage;
 	}
@@ -406,7 +412,13 @@ public class ArticleService implements IarticleService{
 		
 		int countOfAllArticleBySearchWords = articleDao.selectCountOfArticleBySearchWords("article",searchWords);
 		
-		int maxPage = (int) Math.ceil((double)(countOfAllArticleBySearchWords/pageScale)) + 1;
+		int maxPage = (int) Math.floor((double)(countOfAllArticleBySearchWords/pageScale));
+		
+		int remainder = countOfAllArticleBySearchWords%pageScale;
+		
+		if(remainder != 0) {
+			return maxPage + 1;
+		}
 		
 		return maxPage;
 	}
@@ -513,7 +525,13 @@ public class ArticleService implements IarticleService{
 		
 		int countOfAllArticleByLimitDate = articleDao.selectCountOfArticleByDateBetween("article",beginDate,endDate);
 		
-		int maxPage = (int) Math.ceil((double)(countOfAllArticleByLimitDate/pageScale)) + 1;
+		int maxPage = (int) Math.floor((double)(countOfAllArticleByLimitDate/pageScale));
+		
+		int remainder = countOfAllArticleByLimitDate%pageScale;
+		
+		if(remainder != 0) {
+			return maxPage + 1;
+		}
 		
 		return maxPage;
 	}
@@ -708,7 +726,13 @@ public class ArticleService implements IarticleService{
 	public int getMaxPageOfDeletedArticle(int pageScale) {
 		int countOfDeletedArticle = articleDao.selectCountOfDeletedArticle("article");
 		
-		int maxPage = (int) Math.ceil((double)(countOfDeletedArticle/pageScale)) + 1;
+		int maxPage = (int) Math.floor((double)(countOfDeletedArticle/pageScale));
+		
+		int remainder = countOfDeletedArticle%pageScale;
+		
+		if(remainder != 0) {
+			return maxPage + 1;
+		}
 		
 		return maxPage;
 	}
@@ -718,6 +742,7 @@ public class ArticleService implements IarticleService{
 		
 		articleDao.recoverArticleById(article_id);
 		
+		commentDao.recoverCommentByArticleId(article_id);
 		
 	}
 

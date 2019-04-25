@@ -16,6 +16,7 @@ import com.peng.annotation.FrontEndCacheable;
 import com.peng.annotation.RequireToken;
 import com.pengblog.bean.Article;
 import com.pengblog.serviceInterface.IarticleService;
+import com.pengblog.serviceInterface.IcommentService;
 
 /**
  * @author Peng Kaifan
@@ -31,6 +32,11 @@ public class ArticleController {
 	@Qualifier("articleService")
 	private IarticleService articleService;
 	
+	@Autowired
+	@Qualifier("commentService")
+	private IcommentService commentService;
+	
+	
 	@FrontEndCacheable
 	@RequestMapping(value="/article_summary.do",produces="application/json;charset=UTF-8")
 	@ResponseBody
@@ -38,6 +44,11 @@ public class ArticleController {
 										int pageScale) {
 		
 		Article[] articleList = articleService.getArticleSummaryList(startIndex, pageScale);
+		
+		for (int i = 0; i < articleList.length; i++) {
+			int count = commentService.getCountOfCommentByArticleId(articleList[i].getArticle_id());
+			articleList[i].setArticle_countOfAllComment(count);
+		}
 		
 		int count = articleService.getCountOfArticle("article");
 		
@@ -53,7 +64,6 @@ public class ArticleController {
 		return retJson;
 	}
 	
-	@RequireToken
 	@RequestMapping(value="/draft.do",produces="application/json;charset=UTF-8")
 	@ResponseBody
 	public Object getDraft() {
@@ -82,7 +92,7 @@ public class ArticleController {
 	}
 	
 	
-	@RequireToken
+	
 	@RequestMapping(value="/upload_article.do", produces="application/json;charset=UTF-8")
 	@ResponseBody
 	public Object uploadArticle(@RequestBody Map<String,String> articleData) {
@@ -128,7 +138,6 @@ public class ArticleController {
 		return retJson;
 	}
 	
-	@RequireToken
 	@RequestMapping(value="/delete_article.do",produces="application/json;charset=UTF-8")
 	@ResponseBody
 	public Object deleteArticle(int article_id) {
@@ -138,7 +147,6 @@ public class ArticleController {
 		return "delete success";
 	}
 	
-	@RequireToken
 	@RequestMapping(value="/delete_article_list.do",produces="application/json;charset=UTF-8")
 	@ResponseBody
 	public Object deleteArticleList(@RequestBody Map<String,String> deleteArticleListData) {

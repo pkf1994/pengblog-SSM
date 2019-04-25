@@ -45,7 +45,9 @@ public interface IcommentService {
 	int getCountOfCommentByArticleId(int article_id);
 	
 	void deleteCommentById(int comment_id);
-
+	
+	void destroyCommentById(int comment_id);
+	
 	int getMaxPageOfSubComment(int comment_id, int pageScale);
 
 	int getCountOfSubComment(int comment_id);
@@ -61,6 +63,8 @@ public interface IcommentService {
 	Comment[] getTopLevelCommentList(int article_id, int startIndex, int pageScale, String token);
 
 	Comment[] getSubCommentList(int comment_id, int startIndex, int pageScale, String token);
+
+	int getCountOfTopComment(int article_id);
 	
 
 }

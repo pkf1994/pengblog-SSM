@@ -282,4 +282,23 @@
 		WHERE
 			comment_hostId = #{comment_hostId}
 	</delete>
+	
+	<delete id="destroyCommentById">
+		DELETE
+		FROM
+			comment
+		WHERE
+			comment_id = #{comment_id}
+		OR 
+		comment_refercomment = #{comment_id}
+	</delete>
+	
+	<update id="recoverCommentByArticleId">
+		UPDATE 
+			comment
+		SET
+			isdeleted = 0
+		WHERE
+			comment_hostId = #{article_id}
+	</update>
 </mapper>

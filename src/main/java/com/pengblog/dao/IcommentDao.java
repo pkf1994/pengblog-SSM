@@ -29,7 +29,6 @@ public interface IcommentDao {
 
 	List<Comment> selectCommentLastListByLimitIndex(@Param("startIndex")int startIndex, 
 													@Param("pageScale")int pageScale);
-
 	int selectCountOfComment();
 	
 	int selectCountOfSecondaryComment(int comment_id);
@@ -49,5 +48,9 @@ public interface IcommentDao {
 	Comment[] selectSubCommentListWithIPByLimitIndex(@Param("comment_id")int comment_id, @Param("startIndex")int startIndex, @Param("pageScale")int pageScale);
 
 	void destroyCommentByArticleId(int article_id);
+
+	void destroyCommentById(int comment_id);
+	
+	void recoverCommentByArticleId(int article_id);
 	
 }
