@@ -87,11 +87,15 @@ public class IpController {
 		
 		int maxPage = ipService.getCountOfIpObjectBeenBanned(pageScale);
 		
+		int count = ipService.getCountOfIpObjectBeenBanned(pageScale);
+		
 		Map<String,Object> retMap = new HashMap<>();
 		
 		retMap.put("ipList", ipList);
 		
 		retMap.put("maxPage", maxPage);
+		
+		retMap.put("count", count);
 		
 		return ReturnVo.ok(retMap);
 	}

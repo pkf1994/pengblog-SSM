@@ -26,7 +26,7 @@ public class SmsController {
 	
 	@RequestMapping(value="/send.do", produces="application/json;charset=utf-8")
 	@ResponseBody
-	public Object sendSms(String phoneNumber) throws JSONException, HTTPException, IOException {
+	public Object sendSms(String phoneNumber) throws Exception {
 		
 		
 		SendSmsResult sendSmsResult = smsService.send(phoneNumber);

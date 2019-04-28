@@ -10,6 +10,6 @@ import com.pengblog.bean.SendSmsResult;
 
 public interface IsmsService {
 
-	SendSmsResult send(String phoneNumber) throws JSONException, HTTPException, IOException;
+	SendSmsResult send(String phoneNumber) throws JSONException, HTTPException, IOException, Exception;
 
 }

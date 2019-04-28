@@ -29,7 +29,7 @@ public class SmsService implements IsmsService {
 	private SmsSender smsSender;
 	
 	@Override
-	public SendSmsResult send(String phoneNumber) throws JSONException, HTTPException, IOException {
+	public SendSmsResult send(String phoneNumber) throws Exception {
 		
 		SendSmsResult sendSmsResult = new SendSmsResult();
 		
@@ -38,10 +38,8 @@ public class SmsService implements IsmsService {
 		//检查距离上一次发送动态密码到同一号码的时长是否足够60s
 		if(effectiveTimeRemain > 60) {
 			
-			sendSmsResult.setSuccess(false);
-			sendSmsResult.setMessage("in cooldown time");
+			throw new Exception("in cooldown time");
 			
-			return sendSmsResult;
 		}
 		
 		String code = CaptchaCodeGenerator.generate(sizeOfDynamicPassword);

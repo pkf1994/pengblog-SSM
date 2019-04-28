@@ -28,7 +28,7 @@ public class SmsSender {
 	private String[] authenticatedPhoneNumbers;
 	
 	
-	public SendSmsResult send(String phoneNumber,String code,int expireMinutes) throws JSONException, HTTPException, IOException {
+	public SendSmsResult send(String phoneNumber,String code,int expireMinutes) throws Exception {
 		
 		SendSmsResult sendSmsResult = new SendSmsResult();
 		
@@ -36,10 +36,7 @@ public class SmsSender {
 		
 		if(!allowPhoneNumbers.contains(phoneNumber)) {
 			
-			sendSmsResult.setSuccess(false);
-			sendSmsResult.setMessage("Unauthorized Number");
-			
-			return sendSmsResult;
+			throw new Exception("Unauthorized Number");
 		}
 		
 		 String[] params = {code,expireMinutes + ""};

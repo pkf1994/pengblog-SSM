@@ -25,6 +25,8 @@ import com.pengblog.bean.Comment;
 import com.pengblog.bean.IpObject;
 import com.pengblog.bean.SubmitCommentResult;
 import com.pengblog.bean.Visitor;
+import com.pengblog.constant.PengblogConstant;
+import com.pengblog.redis.RedisUtil;
 import com.pengblog.serviceInterface.IcaptchaService;
 import com.pengblog.serviceInterface.IcommentService;
 import com.pengblog.serviceInterface.IipService;
@@ -126,7 +128,7 @@ public class CommentController {
 		Map<String,Object> ret = new HashMap<>();
 		ret.put("maxPage", maxPage);
 		ret.put("subCommentList", commentList);
-		ret.put("countOfSubComment", countOfSubComment);
+		ret.put("count", countOfSubComment);
 		String retJson = gson.toJson(ret);
 		
 		System.out.println(retJson);
@@ -170,6 +172,8 @@ public class CommentController {
 			String captchaCode = (String)commentData.get("captchaCode");
 			
 			CaptchaResult captchaResult = captchaService.checkCaptchaCode(captchaId,captchaCode);
+
+			RedisUtil.delete(captchaId, PengblogConstant.REDIS_CAPTCHA_DBINDEX);
 			
 			if(captchaResult.getPass() == false) {
 				
@@ -246,6 +250,7 @@ public class CommentController {
 		return count;
 	}
 	
+	@RequireToken
 	@RequestMapping(value="/comment_delete.do", produces="application/json;charset=UTF-8")
 	@ResponseBody
 	public Object deleteCommentById(int comment_id) {

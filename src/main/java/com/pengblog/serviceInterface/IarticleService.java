@@ -5,6 +5,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
+
 import com.pengblog.bean.Article;
 
 /**
@@ -18,13 +20,13 @@ public interface IarticleService {
 	 * @param pageScale
 	 * @return
 	 */
-	Article[] getArticleSummaryList(int startIndex, int pageScale);
+	Article[] getArticleSummaryList(int startIndex, int pageScale, int deletedStatus);
 
 	/**
 	 * @param pageScale
 	 * @return
 	 */
-	int getMaxPage(int pageScale);
+	int getMaxPage(int pageScale, int deletedStatus);
 
 	/**
 	 * @param article_id
@@ -38,43 +40,36 @@ public interface IarticleService {
 
 	Article handleImageUrl(Article article);
 
-	Article[] getDraftList(int startIndex, int pageScale);
-
-	int getMaxPageOfDraft(int pageScale);
-
 	void deleteArticleById(int article_id);
 	
 	void destroyArticleById(int article_id);
 
 	void updateArticle(Article handledArticle);
 
-	Map<Integer, Object> getArticleFiling();
+	Map<Integer, Object> getArticleFiling(int deletedStatus);
 
+	List<Map<String, Integer>> getArticleLabelList(int deletedStatus);
 
-	List<Map<String, Integer>> getArticleLabelList();
+	Article[] getArticleItemListByLimitIndexAndSearchWords(int startIndex, int pageScale, String[] searchWords, int deletedStatus);
 
-	Article[] getArticleItemListByLimitIndexAndSearchWords(int startIndex, int pageScale, String[] searchWords);
+	int getMaxPageBySearchWords(int pageScale, String[] searchWords, int deletedStatus);
 
-	int getMaxPageBySearchWords(int pageScale, String[] searchWords);
-
-	int getCountOfArticleBySearchWords(String[] searchWords);
+	int getCountOfArticleBySearchWords(String[] searchWords, int deletedStatus);
 
 	Article[] getArticleItemListByLimitIndexAndYearAndMonth(int startIndex, int pageScale, String selectedYear,
-			String selectedMonth);
+			String selectedMonth, int deletedStatus);
 
-	int getMaxPageByYearAndMonth(int pageScale, String selectedYear, String selectedMonth);
+	int getMaxPageByYearAndMonth(int pageScale, String selectedYear, String selectedMonth, int deletedStatus);
 
-	int getCountOfArticleByYearAndMonth(String selectedYear, String selectedMonth);
+	int getCountOfArticleByYearAndMonth(String selectedYear, String selectedMonth, int deletedStatus);
 
-	Article[] getArticleItemListByLimitIndexAndLabel(int startIndex, int pageScale, String article_label);
+	Article[] getArticleItemListByLimitIndexAndLabel(int startIndex, int pageScale, String article_label, int deletedStatus);
 
-	int getMaxPageByLabel(int pageScale, String article_label);
+	int getMaxPageByLabel(int pageScale, String article_label, int deletedStatus);
 
-	int getCountOfArticleByLabel(String article_label);
+	int getCountOfArticleByLabel(String article_label, int deletedStatus);
 
 	Article handlePreviewImage(Article handledArticle);
-
-	int getCountOfArticle(String article_type);
 
 	Article getDraft();
 
@@ -87,5 +82,9 @@ public interface IarticleService {
 	void recoverArticle(int article_id);
 
 	void destroyAllArticleDeleted();
+
+	int getCountOfArticle(int deletedStatus);
+	
+	int generateDeletedStatus(HttpServletRequest request);
 
 }

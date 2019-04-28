@@ -17,4 +17,6 @@ public class PengblogConstant {
 	public final static int CAPTCHA_CODE_SIZE = 4;
 	
 	public final static int REDIS_TOKEN_DBINDEX = 4;
+	
+	public final static int REDIS_CAPTCHA_DBINDEX = 1;
 }

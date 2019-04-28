@@ -4,6 +4,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
@@ -15,6 +17,8 @@ import com.google.gson.Gson;
 import com.peng.annotation.FrontEndCacheable;
 import com.peng.annotation.RequireToken;
 import com.pengblog.bean.Article;
+import com.pengblog.constant.PengblogConstant;
+import com.pengblog.redis.RedisUtil;
 import com.pengblog.serviceInterface.IarticleService;
 import com.pengblog.serviceInterface.IcommentService;
 
@@ -40,19 +44,22 @@ public class ArticleController {
 	@FrontEndCacheable
 	@RequestMapping(value="/article_summary.do",produces="application/json;charset=UTF-8")
 	@ResponseBody
-	public Object getArticleSummaryList(int startIndex,
+	public Object getArticleSummaryList(HttpServletRequest request,
+										int startIndex,
 										int pageScale) {
 		
-		Article[] articleList = articleService.getArticleSummaryList(startIndex, pageScale);
+		int deletedStatus = articleService.generateDeletedStatus(request);
+		
+		Article[] articleList = articleService.getArticleSummaryList(startIndex, pageScale, deletedStatus);
 		
 		for (int i = 0; i < articleList.length; i++) {
 			int count = commentService.getCountOfCommentByArticleId(articleList[i].getArticle_id());
 			articleList[i].setArticle_countOfAllComment(count);
 		}
 		
-		int count = articleService.getCountOfArticle("article");
+		int count = articleService.getCountOfArticle(deletedStatus);
 		
-		int maxPage = articleService.getMaxPage(pageScale);
+		int maxPage = articleService.getMaxPage(pageScale,deletedStatus);
 		
 		Gson gson = new Gson();
 		Map<String,Object> ret = new HashMap<String,Object>();
@@ -63,6 +70,7 @@ public class ArticleController {
 		
 		return retJson;
 	}
+	
 	
 	@RequestMapping(value="/draft.do",produces="application/json;charset=UTF-8")
 	@ResponseBody
@@ -92,7 +100,7 @@ public class ArticleController {
 	}
 	
 	
-	
+	@RequireToken
 	@RequestMapping(value="/upload_article.do", produces="application/json;charset=UTF-8")
 	@ResponseBody
 	public Object uploadArticle(@RequestBody Map<String,String> articleData) {
@@ -117,27 +125,8 @@ public class ArticleController {
 		return article.getArticle_id();
 	}
 	
-	@RequireToken
-	@RequestMapping(value="/draft_list.do",produces="application/json;charset=UTF-8")
-	@ResponseBody
-	public Object getDraftList(int startIndex,
-								int pageScale) {
-		Article[] articleList = articleService.getDraftList(startIndex,pageScale);
-		
-		int count = articleService.getCountOfArticle("draft");
-		
-		int maxPage = articleService.getMaxPageOfDraft(pageScale);
-		
-		Gson gson = new Gson();
-		Map<String,Object> ret = new HashMap<String,Object>();
-		ret.put("articleList", articleList);
-		ret.put("count",count);
-		ret.put("maxPage", maxPage);
-		String retJson = gson.toJson(ret);
-		
-		return retJson;
-	}
 	
+	@RequireToken
 	@RequestMapping(value="/delete_article.do",produces="application/json;charset=UTF-8")
 	@ResponseBody
 	public Object deleteArticle(int article_id) {
@@ -147,6 +136,7 @@ public class ArticleController {
 		return "delete success";
 	}
 	
+	@RequireToken
 	@RequestMapping(value="/delete_article_list.do",produces="application/json;charset=UTF-8")
 	@ResponseBody
 	public Object deleteArticleList(@RequestBody Map<String,String> deleteArticleListData) {
@@ -167,9 +157,11 @@ public class ArticleController {
 	@FrontEndCacheable
 	@RequestMapping(value="/article_filing.do",produces="application/json;charset=UTF-8")
 	@ResponseBody
-	public Object getArticleFiling() {
+	public Object getArticleFiling(HttpServletRequest request) {
 		
-		Map<Integer,Object> articleFilingMap = articleService.getArticleFiling();
+		int deletedStatus = articleService.generateDeletedStatus(request);
+		
+		Map<Integer,Object> articleFilingMap = articleService.getArticleFiling(deletedStatus);
 		
 		Gson gson = new Gson();
 		
@@ -181,9 +173,11 @@ public class ArticleController {
 	@FrontEndCacheable
 	@RequestMapping(value="/article_label.do",produces="application/json;charset=UTF-8")
 	@ResponseBody
-	public Object getArticleLabelList() {
+	public Object getArticleLabelList(HttpServletRequest request) {
 		
-		List<Map<String, Integer>> articleLabelList = articleService.getArticleLabelList();
+		int deletedStatus = articleService.generateDeletedStatus(request);
+		
+		List<Map<String, Integer>> articleLabelList = articleService.getArticleLabelList(deletedStatus);
 		
 		Gson gson = new Gson();
 		
@@ -194,15 +188,17 @@ public class ArticleController {
 	
 	@RequestMapping(value="/article_bysearch.do",produces="application/json;charset=UTF-8")
 	@ResponseBody
-	public Object getArticleListByLimitIndexAndSearchWords(int startIndex, int pageScale, String searchString) {
+	public Object getArticleListByLimitIndexAndSearchWords(HttpServletRequest request, int startIndex, int pageScale, String searchString) {
+		
+		int deletedStatus = articleService.generateDeletedStatus(request);
 		
 		String[] searchWords = searchString.split("\\s+");
 		
-		Article[] articles = articleService.getArticleItemListByLimitIndexAndSearchWords(startIndex, pageScale, searchWords);
+		Article[] articles = articleService.getArticleItemListByLimitIndexAndSearchWords(startIndex, pageScale, searchWords,deletedStatus);
 		
-		int maxPage = articleService.getMaxPageBySearchWords(pageScale, searchWords);
+		int maxPage = articleService.getMaxPageBySearchWords(pageScale, searchWords, deletedStatus);
 		
-		int countOfAllArticleBySearchWords = articleService.getCountOfArticleBySearchWords(searchWords);
+		int countOfAllArticleBySearchWords = articleService.getCountOfArticleBySearchWords(searchWords, deletedStatus);
 		
 		Map<String, Object> retMap = new HashMap<>();
 		
@@ -210,7 +206,7 @@ public class ArticleController {
 		
 		retMap.put("articleList", articles);
 		
-		retMap.put("countOfAllArticleBySearchWords", countOfAllArticleBySearchWords);
+		retMap.put("count", countOfAllArticleBySearchWords);
 		
 		Gson gson = new Gson();
 		
@@ -221,13 +217,15 @@ public class ArticleController {
 	
 	@RequestMapping(value="/article_byfiling.do",produces="application/json;charset=UTF-8")
 	@ResponseBody
-	public Object getArticleListByLimitIndexAndFilingDate(int startIndex, int pageScale, String selectedYear, String selectedMonth) {
+	public Object getArticleListByLimitIndexAndFilingDate(HttpServletRequest request, int startIndex, int pageScale, String selectedYear, String selectedMonth) {
 		
-		Article[] articles = articleService.getArticleItemListByLimitIndexAndYearAndMonth(startIndex, pageScale, selectedYear, selectedMonth);
+		int deletedStatus = articleService.generateDeletedStatus(request);
 		
-		int maxPage = articleService.getMaxPageByYearAndMonth(pageScale, selectedYear, selectedMonth);
+		Article[] articles = articleService.getArticleItemListByLimitIndexAndYearAndMonth(startIndex, pageScale, selectedYear, selectedMonth, deletedStatus);
 		
-		int countOfAllArticleByFilingDate = articleService.getCountOfArticleByYearAndMonth(selectedYear, selectedMonth);
+		int maxPage = articleService.getMaxPageByYearAndMonth(pageScale, selectedYear, selectedMonth, deletedStatus);
+		
+		int countOfAllArticleByFilingDate = articleService.getCountOfArticleByYearAndMonth(selectedYear, selectedMonth, deletedStatus);
 		
 		Map<String, Object> retMap = new HashMap<>();
 		
@@ -246,13 +244,15 @@ public class ArticleController {
 	
 	@RequestMapping(value="/article_bylabel.do",produces="application/json;charset=UTF-8")
 	@ResponseBody
-	public Object getArticleListByLimitIndexAndLabel(int startIndex, int pageScale, String article_label) {
+	public Object getArticleListByLimitIndexAndLabel(HttpServletRequest request,int startIndex, int pageScale, String article_label) {
 		
-		Article[] articles = articleService.getArticleItemListByLimitIndexAndLabel(startIndex, pageScale, article_label);
+		int deletedStatus = articleService.generateDeletedStatus(request);
 		
-		int maxPage = articleService.getMaxPageByLabel(pageScale, article_label);
+		Article[] articles = articleService.getArticleItemListByLimitIndexAndLabel(startIndex, pageScale, article_label, deletedStatus);
 		
-		int countOfAllArticleByLabel = articleService.getCountOfArticleByLabel(article_label);
+		int maxPage = articleService.getMaxPageByLabel(pageScale, article_label, deletedStatus);
+		
+		int countOfAllArticleByLabel = articleService.getCountOfArticleByLabel(article_label, deletedStatus);
 		
 		Map<String, Object> retMap = new HashMap<>();
 		
@@ -260,7 +260,7 @@ public class ArticleController {
 		
 		retMap.put("articleList", articles);
 		
-		retMap.put("countOfAllArticleByLabel", countOfAllArticleByLabel);
+		retMap.put("count", countOfAllArticleByLabel);
 		
 		Gson gson = new Gson();
 		
@@ -320,6 +320,17 @@ public class ArticleController {
 	public Object destroyAllArticleDeleted() throws Exception {
 		
 		articleService.destroyAllArticleDeleted();
+		
+		return ReturnVo.ok("clean successfully");
+
+	}
+	
+	@RequireToken
+	@RequestMapping(value="/destroy_article.do",produces="application/json;charset=UTF-8")
+	@ResponseBody
+	public Object destroyArticle(int article_id) throws Exception {
+		
+		articleService.destroyArticleById(article_id);
 		
 		return ReturnVo.ok("clean successfully");
 

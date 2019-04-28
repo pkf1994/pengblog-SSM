@@ -65,6 +65,7 @@ public class CaptchaService implements IcaptchaService {
 			
 			captchaResult.setPass(true);
 			
+			
 			return captchaResult;
 		}
 		

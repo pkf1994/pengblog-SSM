@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.google.gson.Gson;
 import com.pengblog.bean.CaptchaResult;
 import com.pengblog.bean.LoginResult;
+import com.pengblog.constant.PengblogConstant;
+import com.pengblog.redis.RedisUtil;
 import com.pengblog.serviceInterface.IcaptchaService;
 import com.pengblog.serviceInterface.IloginService;
 
@@ -54,9 +56,10 @@ public class LoginController {
 		if(!loginResult.getSuccess()) {
 			ReturnVo.err(loginResult.getMessage());
 		}
+		
+		RedisUtil.delete(captchaId, PengblogConstant.REDIS_CAPTCHA_DBINDEX);
 
 		return ReturnVo.ok(loginResult);
-		
 		
 	}
 	

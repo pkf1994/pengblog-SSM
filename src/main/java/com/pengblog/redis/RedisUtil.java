@@ -52,5 +52,12 @@ public class RedisUtil {
 		jedis.close();
 		return effectiveTimeRemain;
 	}
+	
+	public static void delete(String key, int dbIndex) {
+		Jedis jedis = jedisPool.getResource();
+		jedis.select(dbIndex);
+		jedis.del(key);
+		jedis.close();
+	}
 
 }

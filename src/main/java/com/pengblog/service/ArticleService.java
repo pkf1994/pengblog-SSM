@@ -7,6 +7,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jsoup.Jsoup;
@@ -19,8 +21,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.pengblog.bean.Article;
+import com.pengblog.constant.PengblogConstant;
 import com.pengblog.dao.IarticleDao;
 import com.pengblog.dao.IcommentDao;
+import com.pengblog.redis.RedisUtil;
 import com.pengblog.serviceInterface.IarticleService;
 import com.pengblog.serviceInterface.ItxCosService;
 import com.pengblog.utils.ArticleFields;
@@ -50,7 +54,7 @@ public class ArticleService implements IarticleService{
 	 * @see com.pengblog.service.IarticleService#getArticleSummary(int, int)
 	 */
 	@Transactional
-	public Article[] getArticleSummaryList(int startIndex, int pageScale) {
+	public Article[] getArticleSummaryList(int startIndex, int pageScale, int deletedStatus) {
 		
 		List<String> paramList = new ArrayList<>();
 		
@@ -62,9 +66,9 @@ public class ArticleService implements IarticleService{
 		paramList.add("article_label");
 		paramList.add("article_previewImageUrl");
 		paramList.add("article_titleImageUrl");
-
-			
-		Article[] articleList = articleDao.selectArticleListByLimitIndex(startIndex,pageScale,paramList,"article");
+		paramList.add("isDeleted");
+		
+		Article[] articleList = articleDao.selectArticleListByLimitIndex(startIndex,pageScale,paramList,"article",deletedStatus);
 		
 		return articleList;
 	}
@@ -73,9 +77,9 @@ public class ArticleService implements IarticleService{
 	 * @see com.pengblog.service.IarticleService#getMaxPage(int)
 	 */
 	@Transactional
-	public int getMaxPage(int pageScale) {
+	public int getMaxPage(int pageScale, int deletedStatus) {
 		
-		int countOfAllArticle = articleDao.selectCountOfArticle("article");
+		int countOfAllArticle = getCountOfArticle(deletedStatus);
 		
 		if(countOfAllArticle % pageScale == 0) {
 			
@@ -217,32 +221,7 @@ public class ArticleService implements IarticleService{
 		
 		return article_id;
 	}
-
-	@Transactional
-	public Article[] getDraftList(int startIndex, int pageScale) {
-		
-		List<String> paramList = new ArrayList<>();
-		
-		paramList.add(ArticleFields.ARTICLE_ID.fieldName);
-		paramList.add(ArticleFields.ARTICLE_TITLE.fieldName);
-		paramList.add(ArticleFields.ARTICLE_RELEASETIME.fieldName);
-
-			
-		Article[] articleList = articleDao.selectArticleListByLimitIndex(startIndex,pageScale,paramList,"draft");
-		
-		return articleList;
-	}
-
-	@Transactional
-	public int getMaxPageOfDraft(int pageScale) {
-		
-		int countOfAllArticle = articleDao.selectCountOfArticle("draft");
-		
-		int maxPage = (int) Math.ceil((double)(countOfAllArticle/pageScale)) + 1;
-		
-		return maxPage;
-	}
-
+	
 	@Transactional
 	public void deleteArticleById(int article_id) {
 		
@@ -266,19 +245,26 @@ public class ArticleService implements IarticleService{
 		
 		String article_content = article.getArticle_content();
 		
-		Document doc = Jsoup.parse(article_content);
-		
 		List<String> imgUrlList = new ArrayList<>();
 		
-		if(doc.select("img[src]").size() > 0) {
-			
-			Elements els = doc.select("img[src]");
-			
-			for(Element el: els) {
-				imgUrlList.add(el.attr("src"));
-			}
-			
+		if(article.getArticle_titleImageUrl() != null) {
+			imgUrlList.add(article.getArticle_titleImageUrl());
 		}
+		
+		if(article_content != null) {
+			Document doc = Jsoup.parse(article_content);
+			
+			if(doc.select("img[src]").size() > 0) {
+				
+				Elements els = doc.select("img[src]");
+				
+				for(Element el: els) {
+					imgUrlList.add(el.attr("src"));
+				}
+				
+			}
+		}
+		
 		
 		//qiniuService.deleteImage(imgUrlList);
 		txCosService.deleteImage(imgUrlList, article_id);
@@ -302,7 +288,7 @@ public class ArticleService implements IarticleService{
 	}
 
 	@Transactional
-	public Map<Integer, Object> getArticleFiling() {
+	public Map<Integer, Object> getArticleFiling(int deletedStatus) {
 		
 		Map<Integer, Object> retMap = new HashMap<>();
 		
@@ -333,7 +319,7 @@ public class ArticleService implements IarticleService{
 			
 			Date tempDateEndY = tempCalendarEndY.getTime();
 			
-			int countY = articleDao.selectCountOfArticleByDateBetween("article", tempDateBeginY, tempDateEndY);
+			int countY = articleDao.selectCountOfArticleByDateBetween("article", tempDateBeginY, tempDateEndY, deletedStatus);
 			
 			if(countY > 0) {
 				
@@ -362,7 +348,7 @@ public class ArticleService implements IarticleService{
 					
 					Date tempDateEndM = tempCalendarEndM.getTime();
 					
-					int countM = articleDao.selectCountOfArticleByDateBetween("article", tempDateBeginM, tempDateEndM);
+					int countM = articleDao.selectCountOfArticleByDateBetween("article", tempDateBeginM, tempDateEndM,deletedStatus);
 					
 					if(countM > 0) {
 						monthList.add(tempCalendarBeginM.get(Calendar.MONTH) + 1);
@@ -379,17 +365,15 @@ public class ArticleService implements IarticleService{
 
 
 	@Transactional
-	public List<Map<String, Integer>> getArticleLabelList() {
+	public List<Map<String, Integer>> getArticleLabelList(int deletedStatus) {
 
-		List<Map<String, Integer>> articleLabelList = articleDao.selectArticleLabelList();
+		List<Map<String, Integer>> articleLabelList = articleDao.selectArticleLabelList(deletedStatus);
 		
 		return articleLabelList;
 	}
 
 	@Transactional
-	public Article[] getArticleItemListByLimitIndexAndSearchWords(int startIndex, int pageScale,
-			String[] searchWords) {
-		
+	public Article[] getArticleItemListByLimitIndexAndSearchWords(int startIndex, int pageScale,String[] searchWords,int deletedStatus) {
 		
 		List<String> paramList = new ArrayList<>();
 		
@@ -401,16 +385,17 @@ public class ArticleService implements IarticleService{
 		paramList.add("article_label");
 		paramList.add("article_previewImageUrl");
 		paramList.add("article_titleImageUrl");
+		paramList.add("isDeleted");
 	
-		Article[] articles = articleDao.selectArticleByLimitIndexAndSearchWords(startIndex,pageScale,paramList,"article",searchWords);
+		Article[] articles = articleDao.selectArticleByLimitIndexAndSearchWords(startIndex,pageScale,paramList,"article",searchWords,deletedStatus);
 		
 		return articles;
 	}
 
 	@Transactional
-	public int getMaxPageBySearchWords(int pageScale, String[] searchWords) {
+	public int getMaxPageBySearchWords(int pageScale, String[] searchWords, int deletedStatus) {
 		
-		int countOfAllArticleBySearchWords = articleDao.selectCountOfArticleBySearchWords("article",searchWords);
+		int countOfAllArticleBySearchWords = articleDao.selectCountOfArticleBySearchWords("article",searchWords,deletedStatus);
 		
 		int maxPage = (int) Math.floor((double)(countOfAllArticleBySearchWords/pageScale));
 		
@@ -424,9 +409,9 @@ public class ArticleService implements IarticleService{
 	}
 
 	@Transactional
-	public int getCountOfArticleBySearchWords(String[] searchWords) {
+	public int getCountOfArticleBySearchWords(String[] searchWords, int deletedStatus) {
 		
-		int countOfAllArticleBySearchWords = articleDao.selectCountOfArticleBySearchWords("article",searchWords);
+		int countOfAllArticleBySearchWords = articleDao.selectCountOfArticleBySearchWords("article",searchWords,deletedStatus);
 		
 		return countOfAllArticleBySearchWords;
 	}
@@ -435,7 +420,8 @@ public class ArticleService implements IarticleService{
 	public Article[] getArticleItemListByLimitIndexAndYearAndMonth( int startIndex, 
 																	int pageScale, 
 																	String selectedYear,
-																	String selectedMonth) {
+																	String selectedMonth,
+																	int deletedStatus) {
 		
 		Calendar beginCal = Calendar.getInstance();
 		
@@ -479,14 +465,15 @@ public class ArticleService implements IarticleService{
 		paramList.add("article_author");
 		paramList.add("article_releaseTime");
 		paramList.add("article_label");
+		paramList.add("isDeleted");
 		
-		Article[] articles = articleDao.selectArticleByLimitIndexAndDateBetween(startIndex,pageScale,paramList,"article",beginDate,endDate);
+		Article[] articles = articleDao.selectArticleByLimitIndexAndDateBetween(startIndex,pageScale,paramList,"article",beginDate,endDate,deletedStatus);
 		
 		return articles;
 	}
 
 	@Transactional
-	public int getMaxPageByYearAndMonth(int pageScale, String selectedYear, String selectedMonth) {
+	public int getMaxPageByYearAndMonth(int pageScale, String selectedYear, String selectedMonth, int deletedStatus) {
 		
 		Calendar beginCal = Calendar.getInstance();
 		
@@ -523,7 +510,7 @@ public class ArticleService implements IarticleService{
 		
 		Date endDate = endCal.getTime();
 		
-		int countOfAllArticleByLimitDate = articleDao.selectCountOfArticleByDateBetween("article",beginDate,endDate);
+		int countOfAllArticleByLimitDate = articleDao.selectCountOfArticleByDateBetween("article",beginDate,endDate,deletedStatus);
 		
 		int maxPage = (int) Math.floor((double)(countOfAllArticleByLimitDate/pageScale));
 		
@@ -537,7 +524,7 @@ public class ArticleService implements IarticleService{
 	}
 
 	@Transactional
-	public int getCountOfArticleByYearAndMonth(String selectedYear, String selectedMonth) {
+	public int getCountOfArticleByYearAndMonth(String selectedYear, String selectedMonth, int deletedStatus) {
 		
 		Calendar beginCal = Calendar.getInstance();
 		
@@ -574,13 +561,13 @@ public class ArticleService implements IarticleService{
 		
 		Date endDate = endCal.getTime();
 		
-		int countOfAllArticleByLimitDate = articleDao.selectCountOfArticleByDateBetween("article",beginDate,endDate);
+		int countOfAllArticleByLimitDate = articleDao.selectCountOfArticleByDateBetween("article",beginDate,endDate,deletedStatus);
 		
 		return countOfAllArticleByLimitDate;
 	}
 
 	@Transactional
-	public Article[] getArticleItemListByLimitIndexAndLabel(int startIndex, int pageScale, String article_label) {
+	public Article[] getArticleItemListByLimitIndexAndLabel(int startIndex, int pageScale, String article_label, int deletedStatus) {
 
 		List<String> paramList = new ArrayList<>();
 		
@@ -589,16 +576,17 @@ public class ArticleService implements IarticleService{
 		paramList.add("article_author");
 		paramList.add("article_releaseTime");
 		paramList.add("article_label");
+		paramList.add("isDeleted");
 
-		Article[] articles = articleDao.selectArticleByLimitIndexAndLabel(startIndex, pageScale, paramList, "article", article_label);
+		Article[] articles = articleDao.selectArticleByLimitIndexAndLabel(startIndex, pageScale, paramList, "article", article_label, deletedStatus);
 		
 		return articles;
 	}
 
 	@Transactional
-	public int getMaxPageByLabel(int pageScale, String article_label) {
+	public int getMaxPageByLabel(int pageScale, String article_label, int deletedStatus) {
 		
-		int countOfAllArticleByLabel = articleDao.selectCountOfArticleByLabel("article",article_label);
+		int countOfAllArticleByLabel = articleDao.selectCountOfArticleByLabel("article",article_label, deletedStatus);
 		
 		int maxPage = (int) Math.ceil((double)(countOfAllArticleByLabel/pageScale)) + 1;
 		
@@ -606,9 +594,9 @@ public class ArticleService implements IarticleService{
 	}
 
 	@Transactional
-	public int getCountOfArticleByLabel(String article_label) {
+	public int getCountOfArticleByLabel(String article_label, int deletedStatus) {
 		
-		int countOfAllArticleByLabel = articleDao.selectCountOfArticleByLabel("article",article_label);
+		int countOfAllArticleByLabel = articleDao.selectCountOfArticleByLabel("article",article_label,deletedStatus);
 		
 		return countOfAllArticleByLabel;
 	}
@@ -662,16 +650,9 @@ public class ArticleService implements IarticleService{
 	}
 
 	@Transactional
-	public int getCountOfArticle() {
+	public int getCountOfArticle(int deletedStatus) {
 		
-		return getCountOfArticle("article");
-		
-	}
-
-	@Transactional
-	public int getCountOfArticle(String article_type) {
-		
-		int countOfAllArticle = articleDao.selectCountOfArticle("article");
+		int countOfAllArticle = articleDao.selectCountOfArticle("article",deletedStatus);
 		
 		return countOfAllArticle;
 	}
@@ -690,7 +671,7 @@ public class ArticleService implements IarticleService{
 		paramList.add("article_content");
 		paramList.add("article_titleImageUrl");
 			
-		Article[] articleList = articleDao.selectArticleListByLimitIndex(0,1,paramList,"draft");
+		Article[] articleList = articleDao.selectArticleListByLimitIndex(0,1,paramList,"draft",0);
 		
 		if(articleList.length == 0) {
 			return new Article();
@@ -756,5 +737,21 @@ public class ArticleService implements IarticleService{
 		}
 		
 	}
-	
+
+	@Override
+	public int generateDeletedStatus(HttpServletRequest request) {
+		// TODO Auto-generated method stub
+		int deletedStatus;
+		
+		String token = request.getHeader("Authorization");
+		
+		if(null == token || null == RedisUtil.getStringKV(token, PengblogConstant.REDIS_TOKEN_DBINDEX)) {
+			deletedStatus = 0;
+		}else{
+			deletedStatus = 2;
+		}
+		
+		return deletedStatus;
+	}
+
 }

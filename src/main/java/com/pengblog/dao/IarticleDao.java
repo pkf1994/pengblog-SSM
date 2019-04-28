@@ -27,35 +27,41 @@ public interface IarticleDao {
 	Article[] selectArticleListByLimitIndex(@Param("startIndex")int startIndex, 
 											@Param("pageScale")int pageScale, 
 											@Param("paramList")List<String> paramList,
-											@Param("article_type")String article_type);
+											@Param("article_type")String article_type,
+											@Param("deletedStatus")int deletedStatus);
 
 	
-	int selectCountOfArticle(@Param("article_type")String article_type);
+	int selectCountOfArticle(@Param("article_type")String article_type,
+							@Param("deletedStatus")int deletedStatus);
 
 	
 	Article selectArticleById(int article_id);
 
 	int insertArticle(Article article);
 
-	int selectCountOfDraft();
 
 	void deleteArticleById(@Param("article_id")int article_id, 
 							@Param("article_deleteTime")Date date);
 
 	void updateArticle(Article handledArticle);
 
-	int selectCountOfArticleByDateBetween(@Param("article_type")String article_type,@Param("tempDateBegin")Date tempDateBegin, @Param("tempDateEnd")Date tempDateEnd);
+	int selectCountOfArticleByDateBetween(@Param("article_type")String article_type,
+											@Param("tempDateBegin")Date tempDateBegin, 
+											@Param("tempDateEnd")Date tempDateEnd, 
+											@Param("deletedStatus")int deletedStatus);
 
-	List<Map<String, Integer>> selectArticleLabelList();
+	List<Map<String, Integer>> selectArticleLabelList(@Param("deletedStatus")int deletedStatus);
 
 	Article[] selectArticleByLimitIndexAndSearchWords(@Param("startIndex")int startIndex, 
 													@Param("pageScale")int pageScale, 
 													@Param("paramList")List<String> paramList,
 													@Param("article_type")String article_type,
-													@Param("searchWords")String[] searchWords);
+													@Param("searchWords")String[] searchWords, 
+													@Param("deletedStatus")int deletedStatus);
 
 	int selectCountOfArticleBySearchWords(@Param("article_type")String article_type, 
-										@Param("searchWords")String[] searchWords);
+										@Param("searchWords")String[] searchWords, 
+										@Param("deletedStatus")int deletedStatus);
 
 
 	Article[] selectArticleByLimitIndexAndDateBetween(@Param("startIndex")int startIndex, 
@@ -63,18 +69,21 @@ public interface IarticleDao {
 													@Param("paramList")List<String> paramList,
 													@Param("article_type")String article_type, 
 													@Param("beginDate")Date beginDate, 
-													@Param("endDate")Date endDate);
+													@Param("endDate")Date endDate, 
+													@Param("deletedStatus")int deletedStatus);
 
 
 	Article[] selectArticleByLimitIndexAndLabel(@Param("startIndex")int startIndex, 
 												@Param("pageScale")int pageScale, 
 												@Param("paramList")List<String> paramList, 
 												@Param("article_type")String article_type,
-												@Param("article_label")String article_label);
+												@Param("article_label")String article_label, 
+												@Param("deletedStatus")int deletedStatus);
 
 
 	int selectCountOfArticleByLabel(@Param("article_type")String article_type,
-									@Param("article_label")String article_label);
+									@Param("article_label")String article_label, 
+									@Param("deletedStatus")int deletedStatus);
 
 
 	int selectCountOfDeletedArticle(String string);
@@ -92,6 +101,9 @@ public interface IarticleDao {
 
 
 	Integer[] selectAllArticleIdDeleted();
+
+
+	
 
 
 }

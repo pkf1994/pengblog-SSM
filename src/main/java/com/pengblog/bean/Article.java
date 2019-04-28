@@ -39,7 +39,7 @@ public class Article implements Serializable{
 	
 	private int article_countOfAllComment;
 	
-	
+	private boolean isDeleted;
 
 	public int getArticle_countOfAllComment() {
 		return article_countOfAllComment;
@@ -183,12 +183,22 @@ public class Article implements Serializable{
 	public void setArticle_titleImageUrl(String article_titleImageUrl) {
 		this.article_titleImageUrl = article_titleImageUrl;
 	}
+	 
+	
+	public boolean isDeleted() {
+		return isDeleted;
+	}
 
+	public void setDeleted(boolean isDeleted) {
+		this.isDeleted = isDeleted;
+	}
+	
+	
 
 	public Article(Integer article_id, String article_title, String article_author, String article_content,
 			String article_summary, Date article_releaseTime, Date article_deleteTime, String article_label,
 			String article_type, String article_previewImageUrl, String article_titleImageUrl,
-			int article_countOfAllComment) {
+			int article_countOfAllComment, boolean isDeleted) {
 		super();
 		this.article_id = article_id;
 		this.article_title = article_title;
@@ -202,11 +212,9 @@ public class Article implements Serializable{
 		this.article_previewImageUrl = article_previewImageUrl;
 		this.article_titleImageUrl = article_titleImageUrl;
 		this.article_countOfAllComment = article_countOfAllComment;
+		this.isDeleted = isDeleted;
 	}
 
-	/**
-	 * 
-	 */
 	public Article() {
 		super();
 	}
